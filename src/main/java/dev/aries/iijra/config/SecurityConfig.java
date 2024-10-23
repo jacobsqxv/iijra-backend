@@ -1,14 +1,19 @@
 package dev.aries.iijra.config;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+import java.util.List;
+
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import dev.aries.iijra.security.KeyUtil;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +33,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -38,12 +44,28 @@ public class SecurityConfig {
 			"/api/v1/auth/**",
 	};
 	private final UserDetailsService userDetailsService;
-	private final JwtAuthConverter jwtAuthConverter;
-	private final KeyUtil keyUtil;
+	private final JwtConverter jwtConverter;
+	private final JwtAuthConfig jwtAuthConfig;
+
+	@Value(value = "classpath:certificate/jwt-public-key.pem")
+	private RSAPublicKey jwtPublicKey;
+	@Value(value = "classpath:certificate/jwt-private-key.pem")
+	private RSAPrivateKey jwtPrivateKey;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
+				.cors(cors -> cors.configurationSource(request -> {
+					CorsConfiguration config = new CorsConfiguration();
+					config.setAllowedOrigins(List.of(
+							"http://localhost:3000"
+					));
+					config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+					config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+					config.setAllowCredentials(true);
+					config.setMaxAge(3600L);
+					return config;
+				}))
 				.csrf(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(auth -> {
 					auth.requestMatchers(WHITELIST).permitAll();
@@ -54,7 +76,11 @@ public class SecurityConfig {
 				.authenticationProvider(authProvider())
 				.oauth2ResourceServer(oauth2 -> oauth2
 						.jwt(jwt -> jwt
-								.jwtAuthenticationConverter(jwtAuthConverter)))
+								.jwtAuthenticationConverter(jwtConverter)
+						)
+						.authenticationEntryPoint(jwtAuthConfig.jwtAuthEntryPoint())
+						.accessDeniedHandler(jwtAuthConfig.jwtAccessDeniedHandler())
+				)
 				.build();
 	}
 
@@ -78,15 +104,15 @@ public class SecurityConfig {
 	@Bean
 	public JwtDecoder jwtDecoder() {
 		return NimbusJwtDecoder
-				.withPublicKey(keyUtil.getTokenPublicKey())
+				.withPublicKey(jwtPublicKey)
 				.build();
 	}
 
 	@Bean
 	public JwtEncoder jwtEncoder() {
 		JWK jwk = new RSAKey
-				.Builder(keyUtil.getTokenPublicKey())
-				.privateKey(keyUtil.getTokenPrivateKey())
+				.Builder(jwtPublicKey)
+				.privateKey(jwtPrivateKey)
 				.build();
 		JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
 		return new NimbusJwtEncoder(jwks);
