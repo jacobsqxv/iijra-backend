@@ -31,5 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
-.env
-jwt-token-keys/
+/.env
+.editorconfig
+/src/main/resources/certificate/**
