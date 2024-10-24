@@ -1,8 +1,7 @@
 package dev.aries.iijra.module.department;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.utility.Auditing;
@@ -13,12 +12,15 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -28,7 +30,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@ToString
 @EntityListeners(AuditingEntityListener.class)
+@NamedEntityGraph(name = "Department.staff", attributeNodes = @NamedAttributeNode("staff"))
+@NamedEntityGraph(name = "Department.hod", attributeNodes = @NamedAttributeNode("hod"))
 public class Department {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,12 +42,15 @@ public class Department {
 	@Column(nullable = false)
 	private String name;
 
-	@OneToOne
+	@ManyToOne
+	@ToString.Exclude
 	private Staff hod;
 
 	@OneToMany
 	@BatchSize(size = 10)
-	private List<Staff> staff = new ArrayList<>();
+	@ToString.Exclude
+	private Set<Staff> staff = new HashSet<>();
+
 	@Embedded
 	@Column(nullable = false)
 	private Auditing auditing = new Auditing();
@@ -50,28 +58,27 @@ public class Department {
 	public Department(String name) {
 		this.name = name;
 		this.hod = null;
-		this.staff = new ArrayList<>();
+		this.staff = new HashSet<>();
 	}
 
 	@Override
-	public final boolean equals(Object o) {
+	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof Department that)) {
+		if (o == null) {
+			return false;
+		}
+		if (getClass() != o.getClass()) {
 			return false;
 		}
 
-		return id.equals(that.id) && name.equals(that.name) && hod.equals(that.hod) && staff.equals(that.staff);
+		Department department = (Department) o;
+		return id != null && id.equals(department.id);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = id.hashCode();
-		result = 31 * result + name.hashCode();
-		result = 31 * result + hod.hashCode();
-		result = 31 * result + staff.hashCode();
-		result = 31 * result + Objects.hashCode(auditing);
-		return result;
+		return id != null ? id.hashCode() : 31;
 	}
 }

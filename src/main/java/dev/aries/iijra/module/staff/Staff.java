@@ -15,11 +15,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -28,7 +32,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@ToString
 @EntityListeners(AuditingEntityListener.class)
+@NamedEntityGraph(name = "Staff.profile", attributeNodes = @NamedAttributeNode("profile"))
+@NamedEntityGraph(name = "Staff.department", attributeNodes = @NamedAttributeNode("department"))
 public class Staff {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,17 +45,23 @@ public class Staff {
 	private String email;
 
 	@Column(nullable = false)
+	@ToString.Exclude
 	private String password;
 
 	@OneToOne(cascade = CascadeType.ALL)
+	@ToString.Exclude
 	private StaffProfile profile;
 
-	@OneToOne
+	@ManyToOne
+	@ToString.Exclude
 	private Department department;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Role role;
+
+	@Column(nullable = false)
+	private Boolean isHod;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -57,33 +70,32 @@ public class Staff {
 	@Embedded @Column(nullable = false)
 	private Auditing auditing = new Auditing();
 
-	public Staff(String email, String password, Department department, Role role) {
+	public Staff(String email, String password, Department department) {
 		this.email = email;
 		this.password = password;
 		this.department = department;
-		this.role = role;
+		this.role = Role.STAFF;
 		this.status = Status.ACTIVE;
+		this.isHod = false;
 	}
 
 	@Override
-	public final boolean equals(Object o) {
+	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof Staff staff)) {
+		if (o == null) {
 			return false;
 		}
-
-		return id.equals(staff.id) && email.equals(staff.email) && profile.equals(staff.profile) && department.equals(staff.department) && role == staff.role;
+		if (getClass() != o.getClass()) {
+			return false;
+		}
+		Staff staff = (Staff) o;
+		return id != null && id.equals(staff.id);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = id.hashCode();
-		result = 31 * result + email.hashCode();
-		result = 31 * result + profile.hashCode();
-		result = 31 * result + department.hashCode();
-		result = 31 * result + role.hashCode();
-		return result;
+		return id != null ? id.hashCode() : 31;
 	}
 }
