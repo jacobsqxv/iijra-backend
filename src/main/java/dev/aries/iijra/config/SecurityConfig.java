@@ -42,6 +42,7 @@ import org.springframework.web.cors.CorsConfiguration;
 public class SecurityConfig {
 	private static final String[] WHITELIST = {
 			"/api/v1/auth/**",
+			"/api/v1/staff/**"
 	};
 	private final UserDetailsService userDetailsService;
 	private final JwtConverter jwtConverter;
@@ -53,12 +54,13 @@ public class SecurityConfig {
 	private RSAPrivateKey jwtPrivateKey;
 
 	@Bean
+	@SuppressWarnings("java:S4502")
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 				.cors(cors -> cors.configurationSource(request -> {
 					CorsConfiguration config = new CorsConfiguration();
 					config.setAllowedOrigins(List.of(
-							"http://localhost:3000"
+							"http://localhost:4200"
 					));
 					config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 					config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
