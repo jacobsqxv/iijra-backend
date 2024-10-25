@@ -6,6 +6,7 @@ import java.util.stream.IntStream;
 
 import dev.aries.iijra.constant.ExceptionConstant;
 import dev.aries.iijra.enums.TokenType;
+import dev.aries.iijra.exception.InvalidTokenException;
 import dev.aries.iijra.module.staff.Staff;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class TokenService {
 	public void validateToken(Staff staff, String value) {
 		Token token = getTokenByStaffAndValue(staff, value);
 		if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
-			throw new IllegalArgumentException(ExceptionConstant.TOKEN_EXPIRED);
+			throw new InvalidTokenException();
 		}
 	}
 
