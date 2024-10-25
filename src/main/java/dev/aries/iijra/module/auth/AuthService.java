@@ -2,11 +2,13 @@ package dev.aries.iijra.module.auth;
 
 import dev.aries.iijra.constant.ExceptionConstant;
 import dev.aries.iijra.enums.TokenType;
+import dev.aries.iijra.exception.UnauthorizedAccessException;
 import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.module.staff.StaffRepository;
 import dev.aries.iijra.module.token.TokenService;
 import dev.aries.iijra.security.JwtService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,12 +32,19 @@ public class AuthService {
 
 	public LoginResponse login(LoginRequest request) {
 		Staff staff = checkStaff(request.email());
+		checkIsActive(staff);
 		Authentication auth = authManager
 				.authenticate(new UsernamePasswordAuthenticationToken(
 						request.email(), request.password()
 				));
 		String token = jwtService.generateToken(auth);
 		return LoginResponse.newResponse(staff, token);
+	}
+
+	private void checkIsActive(Staff staff) {
+		if (Boolean.FALSE.equals(staff.getIsActive())) {
+			throw new UnauthorizedAccessException(ExceptionConstant.ACCOUNT_NOT_ACTIVATED);
+		}
 	}
 
 	private Staff checkStaff(String email) {
@@ -50,7 +59,7 @@ public class AuthService {
 	}
 
 	@Transactional
-	public String resetPassword(String token, ResetPassword request) {
+	public String resetPassword(@NonNull String token, ResetPassword request) {
 		Staff staff = checkStaff(request.email());
 		tokenService.validateToken(staff, token);
 		staff.setPassword(passwordEncoder.encode(request.password()));
