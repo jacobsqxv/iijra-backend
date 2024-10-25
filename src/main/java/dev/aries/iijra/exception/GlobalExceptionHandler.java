@@ -1,10 +1,11 @@
 package dev.aries.iijra.exception;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-import dev.aries.iijra.global.Response;
 import dev.aries.iijra.constant.ExceptionConstant;
+import dev.aries.iijra.global.Response;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,10 +29,11 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Object> handleUnauthorizedExceptions(Exception exp) {
 		logException(exp);
 		Set<String> details = new HashSet<>();
-		if (exp instanceof DisabledException) {
-			details.add(ExceptionConstant.ACCOUNT_DISABLED);
-		} else {
-			details.add(exp.getMessage());
+		switch (exp) {
+			case UnauthorizedAccessException ex -> details.add(ExceptionConstant.ACCESS_DENIED);
+			case AccessDeniedException ex -> details.add(ExceptionConstant.ACCESS_DENIED);
+			case DisabledException ex -> details.add(ExceptionConstant.ACCOUNT_DISABLED);
+			default -> details.add(exp.getMessage());
 		}
 		HttpStatus code = HttpStatus.FORBIDDEN;
 		return Response.error(code, code.getReasonPhrase(), details);
@@ -41,7 +43,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Object> handleArgumentNotValidException(MethodArgumentNotValidException exp) {
 		logException(exp);
 		Set<String> details = new HashSet<>();
-		exp.getBindingResult().getAllErrors().forEach((error) -> {
+		exp.getBindingResult().getAllErrors().forEach(error -> {
 			String errorMessage = error.getDefaultMessage();
 			details.add(errorMessage);
 		});
@@ -58,11 +60,16 @@ public class GlobalExceptionHandler {
 		return Response.error(code, code.getReasonPhrase(), details);
 	}
 
-	@ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class, BadCredentialsException.class})
+	@ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class,
+			BadCredentialsException.class, InvalidTokenException.class})
 	public ResponseEntity<Object> handleBadRequests(Exception exp) {
 		logException(exp);
 		Set<String> details = new HashSet<>();
-		details.add(exp.getMessage());
+		if (Objects.requireNonNull(exp) instanceof BadCredentialsException) {
+			details.add(ExceptionConstant.INVALID_CREDENTIALS);
+		} else {
+			details.add(exp.getMessage());
+		}
 		HttpStatus code = HttpStatus.BAD_REQUEST;
 		return Response.error(code, code.getReasonPhrase(), details);
 	}
