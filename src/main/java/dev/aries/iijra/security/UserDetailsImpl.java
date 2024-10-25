@@ -3,7 +3,6 @@ package dev.aries.iijra.security;
 import java.util.Collection;
 import java.util.List;
 
-import dev.aries.iijra.enums.Status;
 import dev.aries.iijra.module.staff.Staff;
 import lombok.AllArgsConstructor;
 
@@ -32,23 +31,8 @@ public class UserDetailsImpl implements UserDetails {
 	}
 
 	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@Override
 	public boolean isEnabled() {
-		return staff.getStatus().equals(Status.ACTIVE);
+		return staff.getIsActive();
 	}
 
 }
