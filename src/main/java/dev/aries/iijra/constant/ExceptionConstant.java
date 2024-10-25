@@ -18,6 +18,7 @@ public final class ExceptionConstant {
 	public static final String ACCESS_DENIED = "Access denied: Not authorized to access resource";
 	public static final String INVALID_CREDENTIALS = "Authentication failed: Invalid credentials";
 	public static final String INVALID_TOKEN = "Token is invalid or has expired";
+	public static final String INVALID_ENUM_VALUE = "Invalid enum value provided";
 
 	private ExceptionConstant() {
 	}
