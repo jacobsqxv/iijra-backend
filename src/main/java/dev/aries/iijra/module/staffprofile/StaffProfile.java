@@ -1,5 +1,7 @@
 package dev.aries.iijra.module.staffprofile;
 
+import java.util.Objects;
+
 import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.utility.Auditing;
 import jakarta.persistence.CascadeType;
@@ -13,10 +15,12 @@ import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.proxy.HibernateProxy;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -26,6 +30,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @ToString
 @Entity
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 @NamedEntityGraph(name = "StaffProfile.staff", attributeNodes = @NamedAttributeNode("staff"))
 public class StaffProfile {
@@ -56,25 +61,30 @@ public class StaffProfile {
 		this.staff = staff;
 	}
 
-
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		if (this == o) {
 			return true;
 		}
 		if (o == null) {
 			return false;
 		}
-		if (getClass() != o.getClass()) {
+		Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ?
+				proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+		Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ?
+				proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+		if (!thisEffectiveClass.equals(oEffectiveClass)) {
 			return false;
 		}
-
-		StaffProfile profile = (StaffProfile) o;
-		return id != null && id.equals(profile.id);
+		if (!(o instanceof StaffProfile that)) {
+			return false;
+		}
+		return getId() != null && Objects.equals(getId(), that.getId());
 	}
 
 	@Override
-	public int hashCode() {
-		return id != null ? id.hashCode() : 31;
+	public final int hashCode() {
+		return this instanceof HibernateProxy proxy ?
+				proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
 	}
 }

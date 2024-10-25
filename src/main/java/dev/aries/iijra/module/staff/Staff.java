@@ -1,5 +1,7 @@
 package dev.aries.iijra.module.staff;
 
+import java.util.Objects;
+
 import dev.aries.iijra.enums.Role;
 import dev.aries.iijra.enums.Status;
 import dev.aries.iijra.module.department.Department;
@@ -20,10 +22,12 @@ import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.proxy.HibernateProxy;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -32,6 +36,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @ToString
 @EntityListeners(AuditingEntityListener.class)
 @NamedEntityGraph(name = "Staff.profile", attributeNodes = @NamedAttributeNode("profile"))
@@ -67,6 +72,9 @@ public class Staff {
 	@Enumerated(EnumType.STRING)
 	private Status status;
 
+	@Column(nullable = false)
+	private Boolean isActive;
+
 	@Embedded @Column(nullable = false)
 	private Auditing auditing = new Auditing();
 
@@ -77,25 +85,33 @@ public class Staff {
 		this.role = Role.STAFF;
 		this.status = Status.ACTIVE;
 		this.isHod = false;
+		this.isActive = false;
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		if (this == o) {
 			return true;
 		}
 		if (o == null) {
 			return false;
 		}
-		if (getClass() != o.getClass()) {
+		Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ?
+				proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+		Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ?
+				proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+		if (!thisEffectiveClass.equals(oEffectiveClass)) {
 			return false;
 		}
-		Staff staff = (Staff) o;
-		return id != null && id.equals(staff.id);
+		if (!(o instanceof Staff that)) {
+			return false;
+		}
+		return getId() != null && Objects.equals(getId(), that.getId());
 	}
 
 	@Override
-	public int hashCode() {
-		return id != null ? id.hashCode() : 31;
+	public final int hashCode() {
+		return this instanceof HibernateProxy proxy ?
+				proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
 	}
 }

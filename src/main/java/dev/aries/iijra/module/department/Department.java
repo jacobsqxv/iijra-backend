@@ -1,6 +1,7 @@
 package dev.aries.iijra.module.department;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import dev.aries.iijra.module.staff.Staff;
@@ -22,6 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.proxy.HibernateProxy;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -62,23 +64,29 @@ public class Department {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		if (this == o) {
 			return true;
 		}
 		if (o == null) {
 			return false;
 		}
-		if (getClass() != o.getClass()) {
+		Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ?
+				proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+		Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ?
+				proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+		if (!thisEffectiveClass.equals(oEffectiveClass)) {
 			return false;
 		}
-
-		Department department = (Department) o;
-		return id != null && id.equals(department.id);
+		if (!(o instanceof Department that)) {
+			return false;
+		}
+		return getId() != null && Objects.equals(getId(), that.getId());
 	}
 
 	@Override
-	public int hashCode() {
-		return id != null ? id.hashCode() : 31;
+	public final int hashCode() {
+		return this instanceof HibernateProxy proxy ?
+				proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
 	}
 }
