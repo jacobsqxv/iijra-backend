@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 import dev.aries.iijra.constant.ExceptionConstant;
 import dev.aries.iijra.enums.TokenType;
 import dev.aries.iijra.exception.InvalidTokenException;
-import dev.aries.iijra.module.staff.Staff;
+import dev.aries.iijra.module.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +21,11 @@ public class TokenService {
 	private final TokenRepository tokenRepo;
 	private final SecureRandom secureRandom = new SecureRandom();
 
-	public void addNewToken(Staff staff, TokenType type) {
-		cleanUpPreviousToken(staff, type);
+	public void addNewToken(User user, TokenType type) {
+		cleanUpPreviousToken(user, type);
 		String value = generateToken();
 		Token newToken = new Token(
-				staff,
+				user,
 				value,
 				type,
 				LocalDateTime.now().plusMinutes(15)
@@ -34,8 +34,8 @@ public class TokenService {
 		log.info("Token saved successfully: {}", value);
 	}
 
-	private void cleanUpPreviousToken(Staff staff, TokenType type) {
-		tokenRepo.deleteAll(tokenRepo.findByStaffAndType(staff, type));
+	private void cleanUpPreviousToken(User user, TokenType type) {
+		tokenRepo.deleteAll(tokenRepo.findByUserAndType(user, type));
 	}
 
 	private String generateToken() {
@@ -44,20 +44,20 @@ public class TokenService {
 		return token.toString();
 	}
 
-	public void validateToken(Staff staff, String value) {
-		Token token = getTokenByStaffAndValue(staff, value);
+	public void validateToken(User user, String value) {
+		Token token = getTokenByUserAndValue(user, value);
 		if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
 			throw new InvalidTokenException();
 		}
 	}
 
-	private Token getTokenByStaffAndValue(Staff staff, String value) {
-		return tokenRepo.findByStaffAndValue(staff, value)
+	private Token getTokenByUserAndValue(User user, String value) {
+		return tokenRepo.findByUserAndValue(user, value)
 				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.TOKEN_VALUE_DOESNT_EXIST + value));
 	}
 
-	public void deleteUsedToken(Staff staff, String value) {
-		tokenRepo.deleteByStaffAndValue(staff, value);
+	public void deleteUsedToken(User user, String value) {
+		tokenRepo.deleteByUserAndValue(user, value);
 		log.info("Token deleted successfully");
 	}
 }

@@ -4,17 +4,17 @@ import java.util.List;
 import java.util.Optional;
 
 import dev.aries.iijra.enums.TokenType;
-import dev.aries.iijra.module.staff.Staff;
+import dev.aries.iijra.module.user.User;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TokenRepository extends JpaRepository<Token, Long> {
 
-	List<Token> findByStaffAndType(Staff staff, TokenType type);
+	List<Token> findByUserAndType(User user, TokenType type);
 
-	@EntityGraph(value = "Token.staff")
-	Optional<Token> findByStaffAndValue(Staff staff, String value);
+	@EntityGraph(value = "Token.user")
+	Optional<Token> findByUserAndValue(User user, String value);
 
-	void deleteByStaffAndValue(Staff staff, String value);
+	void deleteByUserAndValue(User user, String value);
 }
