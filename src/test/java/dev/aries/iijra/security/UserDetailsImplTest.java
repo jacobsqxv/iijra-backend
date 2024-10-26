@@ -72,17 +72,17 @@ class UserDetailsImplTest {
 	}
 
 	@Test
-	@DisplayName("Should return true when isActive is set to true")
+	@DisplayName("Should return true when isArchived is set to true")
 	void isEnabled_WhenIsActive_ShouldReturnTrue() {
-		staff.setIsActive(true);
+		staff.setIsArchived(false);
 
 		assertTrue(userDetails.isEnabled());
 	}
 
 	@Test
-	@DisplayName("Should return false when isActive is set to false")
+	@DisplayName("Should return false when isArchived is set to false")
 	void isEnabled_WhenNotIsActive_ShouldReturnFalse() {
-		staff.setIsActive(false);
+		staff.setIsArchived(true);
 
 		assertFalse(userDetails.isEnabled());
 	}

@@ -13,7 +13,7 @@ public final class ExceptionConstant {
 	public static final String TOKEN_VALUE_DOESNT_EXIST = "Token does not exist with value: ";
 
 	public static final String ACCOUNT_DISABLED = "Cannot log in at this time, account has been disabled";
-	public static final String ACCOUNT_NOT_ACTIVATED = "Cannot log in at this time, account has not been activated";
+	public static final String ACCOUNT_DEACTIVATED = "Cannot log in at this time, account has been deactivated";
 	public static final String INVALID_REQUEST = "There was a problem with the request";
 	public static final String ACCESS_DENIED = "Access denied: Not authorized to access resource";
 	public static final String INVALID_CREDENTIALS = "Authentication failed: Invalid credentials";

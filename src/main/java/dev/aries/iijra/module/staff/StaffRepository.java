@@ -18,7 +18,7 @@ public interface StaffRepository extends JpaRepository<Staff, Long>, JpaSpecific
 
 	@EntityGraph(attributePaths = {"department", "profile"})
 	default Page<Staff> findAll(GetStaffPage request, Pageable pageable) {
-		return findAll(StaffSpecification.buildSpecification(request), pageable);
+		return findAll(StaffSpecification.buildSpecification(request, false), pageable);
 	}
 
 	boolean existsByRole(Role role);

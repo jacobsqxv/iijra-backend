@@ -73,7 +73,7 @@ public class Staff {
 	private Status status;
 
 	@Column(nullable = false)
-	private Boolean isActive;
+	private Boolean isArchived;
 
 	@Embedded @Column(nullable = false)
 	private Auditing auditing = new Auditing();
@@ -85,7 +85,7 @@ public class Staff {
 		this.role = Role.STAFF;
 		this.status = Status.ACTIVE;
 		this.isHod = false;
-		this.isActive = false;
+		this.isArchived = false;
 	}
 
 	@Override

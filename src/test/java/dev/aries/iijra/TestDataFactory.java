@@ -14,7 +14,7 @@ public class TestDataFactory {
 				.password("hashedPassword")
 				.role(Role.STAFF)
 				.profile(newStaffProfile())
-				.isActive(true)
+				.isArchived(false)
 				.status(Status.ACTIVE).build();
 	}
 

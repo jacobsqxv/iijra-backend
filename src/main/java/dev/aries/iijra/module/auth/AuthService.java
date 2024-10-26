@@ -32,7 +32,7 @@ public class AuthService {
 
 	public LoginResponse login(LoginRequest request) {
 		Staff staff = checkStaff(request.email());
-		checkIsActive(staff);
+		checkIsDeleted(staff);
 		Authentication auth = authManager
 				.authenticate(new UsernamePasswordAuthenticationToken(
 						request.email(), request.password()
@@ -41,9 +41,9 @@ public class AuthService {
 		return LoginResponse.newResponse(staff, token);
 	}
 
-	private void checkIsActive(Staff staff) {
-		if (Boolean.FALSE.equals(staff.getIsActive())) {
-			throw new UnauthorizedAccessException(ExceptionConstant.ACCOUNT_NOT_ACTIVATED);
+	private void checkIsDeleted(Staff staff) {
+		if (Boolean.TRUE.equals(staff.getIsArchived())) {
+			throw new UnauthorizedAccessException(ExceptionConstant.ACCOUNT_DEACTIVATED);
 		}
 	}
 

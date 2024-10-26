@@ -57,10 +57,14 @@ public class Department {
 	@Column(nullable = false)
 	private Auditing auditing = new Auditing();
 
+	@Column(nullable = false)
+	private Boolean isArchived;
+
 	public Department(String name) {
 		this.name = name;
 		this.hod = null;
 		this.staff = new HashSet<>();
+		this.isArchived = false;
 	}
 
 	@Override

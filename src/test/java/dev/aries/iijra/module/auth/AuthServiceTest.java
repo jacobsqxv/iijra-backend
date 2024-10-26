@@ -103,11 +103,11 @@ class AuthServiceTest {
 		}
 
 		@Test
-		@DisplayName("Should throw exception when staff is not active")
+		@DisplayName("Should throw exception when staff is deleted")
 		void login_InactiveStaff_ShouldThrowException() {
 			LoginRequest loginRequest = new LoginRequest("test@email.com", "Test123");
 			testStaff = TestDataFactory.newStaff();
-			testStaff.setIsActive(false);
+			testStaff.setIsArchived(true);
 
 			when(staffRepo.findByEmail(loginRequest.email()))
 					.thenReturn(Optional.of(testStaff));
