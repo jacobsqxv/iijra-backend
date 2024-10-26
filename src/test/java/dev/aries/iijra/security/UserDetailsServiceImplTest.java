@@ -60,9 +60,7 @@ class UserDetailsServiceImplTest {
 		when(userRepo.findByEmail(TEST_EMAIL))
 				.thenReturn(Optional.empty());
 
-		Exception exception = assertThrows(UsernameNotFoundException.class, () -> {
-			userDetailsService.loadUserByUsername(TEST_EMAIL);
-		});
+		Exception exception = assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername(TEST_EMAIL));
 
 		assertEquals(ExceptionConstant.USER_EMAIL_DOESNT_EXIST + TEST_EMAIL, exception.getMessage());
 
@@ -71,9 +69,8 @@ class UserDetailsServiceImplTest {
 
 	@Test
 	void loadUserByUsername_WhenEmailIsNull_ThrowsException() {
-		assertThrows(NullPointerException.class, () -> {
-			userDetailsService.loadUserByUsername(null);
-		});
+		//noinspection DataFlowIssue
+		assertThrows(NullPointerException.class, () -> userDetailsService.loadUserByUsername(null));
 
 		verify(userRepo, never()).findByEmail(any());
 	}
