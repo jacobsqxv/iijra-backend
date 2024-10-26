@@ -1,19 +1,15 @@
-package dev.aries.iijra.module.staff;
+package dev.aries.iijra.module.admin;
 
 import java.util.Objects;
 
-import dev.aries.iijra.module.department.Department;
 import dev.aries.iijra.module.user.User;
-import dev.aries.iijra.utility.Auditing;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedAttributeNode;
-import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,52 +29,24 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @ToString
 @EntityListeners(AuditingEntityListener.class)
-@NamedEntityGraph(name = "Staff.user", attributeNodes = @NamedAttributeNode("user"))
-@NamedEntityGraph(name = "Staff.department", attributeNodes = @NamedAttributeNode("department"))
-public class Staff {
-
+public class Admin {
 	@Id
-	@Column(updatable = false, nullable = false)
-	private String id;
-
-	private String profileImage;
-
-	@Column(nullable = false)
-	private String fullName;
-
-	@Column(columnDefinition = "TEXT", length = 500)
-	private String bio;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
 	@OneToOne
 	@JoinColumn(nullable = false)
 	@ToString.Exclude
 	private User user;
 
-	@ManyToOne
-	@ToString.Exclude
-	private Department department;
+	private String profileImage;
 
 	@Column(nullable = false)
-	private Boolean isHod;
+	private String fullName;
 
-	@Embedded
-	@Column(nullable = false)
-	private Auditing auditing = new Auditing();
-
-	public Staff(String id, String fullName, User user, Department department) {
-		this.id = id;
-		this.fullName = fullName;
+	public Admin(User user, String fullName) {
 		this.user = user;
-		this.department = department;
-		this.isHod = false;
-	}
-
-	public void archive() {
-		this.user.archive();
-	}
-
-	public void restore() {
-		this.user.restore();
+		this.fullName = fullName;
 	}
 
 	@Override
@@ -96,7 +64,7 @@ public class Staff {
 		if (!thisEffectiveClass.equals(oEffectiveClass)) {
 			return false;
 		}
-		if (!(o instanceof Staff that)) {
+		if (!(o instanceof Admin that)) {
 			return false;
 		}
 		return getId() != null && Objects.equals(getId(), that.getId());

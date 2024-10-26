@@ -20,17 +20,17 @@ public final class StaffSpecification {
 			List<Predicate> predicates = new ArrayList<>();
 
 			// Always filter out archived staff
-			predicates.add(cb.equal(root.get("isArchived"), isArchived));
+			predicates.add(cb.equal(root.get("user").get("isArchived"), isArchived));
 
 			// Handle search term (name OR email)
 			if (request.search() != null && !request.search().trim().isEmpty()) {
 				String searchTerm = "%" + request.search().toLowerCase() + "%";
 				Predicate namePredicate = cb.like(
-						cb.lower(root.get("profile").get("fullName")),
+						cb.lower(root.get("fullName")),
 						searchTerm
 				);
 				Predicate emailPredicate = cb.like(
-						cb.lower(root.get("email")),
+						cb.lower(root.get("user").get("email")),
 						searchTerm
 				);
 				predicates.add(cb.or(namePredicate, emailPredicate));
