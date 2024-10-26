@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import dev.aries.iijra.TestDataFactory;
 import dev.aries.iijra.enums.Role;
-import dev.aries.iijra.module.staff.Staff;
+import dev.aries.iijra.module.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,13 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class UserDetailsImplTest {
-	private Staff staff;
+	private User user;
 	private UserDetailsImpl userDetails;
 
 	@BeforeEach
 	void setUp() {
-		staff = TestDataFactory.newStaff();
-		userDetails = new UserDetailsImpl(staff);
+		user = TestDataFactory.newUser();
+		userDetails = new UserDetailsImpl(user);
 	}
 
 	@Test
@@ -45,7 +45,7 @@ class UserDetailsImplTest {
 	@Test
 	@DisplayName("Should return same role in getAuthorities()")
 	void getAuthorities_WithAdminRole_ShouldReturnAdminAuthority() {
-		staff.setRole(Role.SYS_ADMIN);
+		user.setRole(Role.SYS_ADMIN);
 		SimpleGrantedAuthority expectedAuthority = new SimpleGrantedAuthority(Role.SYS_ADMIN.name());
 
 		Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
@@ -74,7 +74,7 @@ class UserDetailsImplTest {
 	@Test
 	@DisplayName("Should return true when isArchived is set to true")
 	void isEnabled_WhenIsActive_ShouldReturnTrue() {
-		staff.setIsArchived(false);
+		user.setIsArchived(false);
 
 		assertTrue(userDetails.isEnabled());
 	}
@@ -82,7 +82,7 @@ class UserDetailsImplTest {
 	@Test
 	@DisplayName("Should return false when isArchived is set to false")
 	void isEnabled_WhenNotIsActive_ShouldReturnFalse() {
-		staff.setIsArchived(true);
+		user.setIsArchived(true);
 
 		assertFalse(userDetails.isEnabled());
 	}

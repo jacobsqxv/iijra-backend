@@ -2,8 +2,9 @@ package dev.aries.iijra.security;
 
 import java.util.Optional;
 
-import dev.aries.iijra.module.staff.Staff;
-import dev.aries.iijra.module.staff.StaffRepository;
+import dev.aries.iijra.constant.ExceptionConstant;
+import dev.aries.iijra.module.user.User;
+import dev.aries.iijra.module.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,21 +30,21 @@ class UserDetailsServiceImplTest {
 
 	private static final String TEST_EMAIL = "test@example.com";
 	@Mock
-	private StaffRepository staffRepo;
+	private UserRepository userRepo;
 	@InjectMocks
 	private UserDetailsServiceImpl userDetailsService;
-	private Staff testStaff;
+	private User testUser;
 
 	@BeforeEach
 	void setUp() {
-		testStaff = new Staff();
-		testStaff.setEmail(TEST_EMAIL);
+		testUser = new User();
+		testUser.setEmail(TEST_EMAIL);
 	}
 
 	@Test
 	void loadUserByUsername_WhenUserExists_ReturnsUserDetails() {
-		when(staffRepo.findByEmail(TEST_EMAIL))
-				.thenReturn(Optional.of(testStaff));
+		when(userRepo.findByEmail(TEST_EMAIL))
+				.thenReturn(Optional.of(testUser));
 
 		UserDetails result = userDetailsService.loadUserByUsername(TEST_EMAIL);
 
@@ -51,21 +52,21 @@ class UserDetailsServiceImplTest {
 		assertInstanceOf(UserDetailsImpl.class, result);
 		assertEquals(TEST_EMAIL, result.getUsername());
 
-		verify(staffRepo, times(1)).findByEmail(TEST_EMAIL);
+		verify(userRepo, times(1)).findByEmail(TEST_EMAIL);
 	}
 
 	@Test
 	void loadUserByUsername_WhenUserDoesNotExist_ThrowsException() {
-		when(staffRepo.findByEmail(TEST_EMAIL))
+		when(userRepo.findByEmail(TEST_EMAIL))
 				.thenReturn(Optional.empty());
 
 		Exception exception = assertThrows(UsernameNotFoundException.class, () -> {
 			userDetailsService.loadUserByUsername(TEST_EMAIL);
 		});
 
-		assertEquals("Staff does not exist", exception.getMessage());
+		assertEquals(ExceptionConstant.USER_EMAIL_DOESNT_EXIST + TEST_EMAIL, exception.getMessage());
 
-		verify(staffRepo, times(1)).findByEmail(TEST_EMAIL);
+		verify(userRepo, times(1)).findByEmail(TEST_EMAIL);
 	}
 
 	@Test
@@ -74,6 +75,6 @@ class UserDetailsServiceImplTest {
 			userDetailsService.loadUserByUsername(null);
 		});
 
-		verify(staffRepo, never()).findByEmail(any());
+		verify(userRepo, never()).findByEmail(any());
 	}
 }

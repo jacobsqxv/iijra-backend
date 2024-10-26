@@ -8,7 +8,7 @@ import java.util.Optional;
 import dev.aries.iijra.constant.ExceptionConstant;
 import dev.aries.iijra.enums.TokenType;
 import dev.aries.iijra.exception.InvalidTokenException;
-import dev.aries.iijra.module.staff.Staff;
+import dev.aries.iijra.module.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,11 +39,11 @@ class TokenServiceTest {
 	@Mock
 	private TokenRepository tokenRepo;
 
-	private Staff testStaff;
+	private User testUser;
 
 	@BeforeEach
 	void setUp() {
-		testStaff = new Staff();
+		testUser = new User();
 	}
 
 	@Nested
@@ -54,7 +54,7 @@ class TokenServiceTest {
 		void addNewToken_ShouldGenerateSixDigitToken() {
 			TokenType type = TokenType.PASSWORD_RESET;
 
-			tokenService.addNewToken(testStaff, type);
+			tokenService.addNewToken(testUser, type);
 
 			ArgumentCaptor<Token> tokenCaptor = ArgumentCaptor.forClass(Token.class);
 			verify(tokenRepo).save(tokenCaptor.capture());
@@ -71,12 +71,12 @@ class TokenServiceTest {
 		void addNewToken_ShouldCleanUpPreviousTokens() {
 			TokenType type = TokenType.PASSWORD_RESET;
 			List<Token> previousTokens = Arrays.asList(
-					new Token(testStaff, TEST_TOKEN_VALUE, type, LocalDateTime.now().minusMinutes(3)),
-					new Token(testStaff, TEST_TOKEN_VALUE, type, LocalDateTime.now().minusMinutes(1))
+					new Token(testUser, TEST_TOKEN_VALUE, type, LocalDateTime.now().minusMinutes(3)),
+					new Token(testUser, TEST_TOKEN_VALUE, type, LocalDateTime.now().minusMinutes(1))
 			);
-			when(tokenRepo.findByStaffAndType(testStaff, type)).thenReturn(previousTokens);
+			when(tokenRepo.findByUserAndType(testUser, type)).thenReturn(previousTokens);
 
-			tokenService.addNewToken(testStaff, type);
+			tokenService.addNewToken(testUser, type);
 
 			verify(tokenRepo).deleteAll(previousTokens);
 			verify(tokenRepo).save(any(Token.class));
@@ -88,7 +88,7 @@ class TokenServiceTest {
 			TokenType type = TokenType.PASSWORD_RESET;
 			LocalDateTime beforeTest = LocalDateTime.now();
 
-			tokenService.addNewToken(testStaff, type);
+			tokenService.addNewToken(testUser, type);
 
 			ArgumentCaptor<Token> tokenCaptor = ArgumentCaptor.forClass(Token.class);
 			verify(tokenRepo).save(tokenCaptor.capture());
@@ -96,7 +96,7 @@ class TokenServiceTest {
 			Token savedToken = tokenCaptor.getValue();
 			LocalDateTime expirationTime = savedToken.getExpiresAt();
 
-			assertEquals(testStaff, savedToken.getStaff());
+			assertEquals(testUser, savedToken.getUser());
 			assertEquals(type, savedToken.getType());
 			assertNotNull(savedToken.getValue());
 			assertNotNull(savedToken.getExpiresAt());
@@ -111,33 +111,33 @@ class TokenServiceTest {
 		@DisplayName("Should successfully validate valid non-expired token")
 		void validateToken_WithValidTokenAndNotExpired_ShouldNotThrowException() {
 			LocalDateTime futureTime = LocalDateTime.now().plusMinutes(5);
-			Token validToken = new Token(testStaff, TEST_TOKEN_VALUE, TokenType.PASSWORD_RESET, futureTime);
-			when(tokenRepo.findByStaffAndValue(testStaff, TEST_TOKEN_VALUE))
+			Token validToken = new Token(testUser, TEST_TOKEN_VALUE, TokenType.PASSWORD_RESET, futureTime);
+			when(tokenRepo.findByUserAndValue(testUser, TEST_TOKEN_VALUE))
 					.thenReturn(Optional.of(validToken));
 
-			assertDoesNotThrow(() -> tokenService.validateToken(testStaff, TEST_TOKEN_VALUE));
+			assertDoesNotThrow(() -> tokenService.validateToken(testUser, TEST_TOKEN_VALUE));
 		}
 
 		@Test
 		@DisplayName("Should throw exception with expired token")
 		void validateToken_WithExpiredToken_ShouldThrowInvalidTokenException() {
 			LocalDateTime pastTime = LocalDateTime.now().minusMinutes(5);
-			Token expiredToken = new Token(testStaff, TEST_TOKEN_VALUE, TokenType.PASSWORD_RESET, pastTime);
+			Token expiredToken = new Token(testUser, TEST_TOKEN_VALUE, TokenType.PASSWORD_RESET, pastTime);
 
-			when(tokenRepo.findByStaffAndValue(testStaff, TEST_TOKEN_VALUE)).thenReturn(Optional.of(expiredToken));
+			when(tokenRepo.findByUserAndValue(testUser, TEST_TOKEN_VALUE)).thenReturn(Optional.of(expiredToken));
 
 			assertThrows(InvalidTokenException.class,
-					() -> tokenService.validateToken(testStaff, TEST_TOKEN_VALUE));
+					() -> tokenService.validateToken(testUser, TEST_TOKEN_VALUE));
 		}
 
 		@Test
 		@DisplayName("Should throw exception with non-existing token")
 		void validateToken_WithNonexistentToken_ShouldThrowEntityNotFoundException() {
-			when(tokenRepo.findByStaffAndValue(testStaff, TEST_TOKEN_VALUE))
+			when(tokenRepo.findByUserAndValue(testUser, TEST_TOKEN_VALUE))
 					.thenReturn(Optional.empty());
 
 			EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-					() -> tokenService.validateToken(testStaff, TEST_TOKEN_VALUE));
+					() -> tokenService.validateToken(testUser, TEST_TOKEN_VALUE));
 
 			assertTrue(exception.getMessage().contains(ExceptionConstant.TOKEN_VALUE_DOESNT_EXIST));
 			assertTrue(exception.getMessage().contains(TEST_TOKEN_VALUE));
@@ -147,12 +147,12 @@ class TokenServiceTest {
 		@DisplayName("Should throw exception with token expiring at time of validation")
 		void validateToken_WithBoundaryExpirationTime_ShouldBehaveCorrectly() {
 			LocalDateTime exactlyNow = LocalDateTime.now();
-			Token tokenExactlyNow = new Token(testStaff, TEST_TOKEN_VALUE, TokenType.PASSWORD_RESET, exactlyNow);
-			when(tokenRepo.findByStaffAndValue(testStaff, TEST_TOKEN_VALUE))
+			Token tokenExactlyNow = new Token(testUser, TEST_TOKEN_VALUE, TokenType.PASSWORD_RESET, exactlyNow);
+			when(tokenRepo.findByUserAndValue(testUser, TEST_TOKEN_VALUE))
 					.thenReturn(Optional.of(tokenExactlyNow));
 
 			assertThrows(InvalidTokenException.class,
-					() -> tokenService.validateToken(testStaff, TEST_TOKEN_VALUE),
+					() -> tokenService.validateToken(testUser, TEST_TOKEN_VALUE),
 					"Token expiring exactly now should be considered expired");
 		}
 	}
@@ -162,11 +162,11 @@ class TokenServiceTest {
 		@Test
 		@DisplayName("Should delete token successfully using correct repository method")
 		void deleteUsedToken_ShouldCallRepositoryDelete() {
-			doNothing().when(tokenRepo).deleteByStaffAndValue(testStaff, TEST_TOKEN_VALUE);
+			doNothing().when(tokenRepo).deleteByUserAndValue(testUser, TEST_TOKEN_VALUE);
 
-			tokenService.deleteUsedToken(testStaff, TEST_TOKEN_VALUE);
+			tokenService.deleteUsedToken(testUser, TEST_TOKEN_VALUE);
 
-			verify(tokenRepo).deleteByStaffAndValue(testStaff, TEST_TOKEN_VALUE);
+			verify(tokenRepo).deleteByUserAndValue(testUser, TEST_TOKEN_VALUE);
 		}
 	}
 
