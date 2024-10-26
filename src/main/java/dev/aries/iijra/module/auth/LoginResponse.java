@@ -1,23 +1,21 @@
 package dev.aries.iijra.module.auth;
 
-import dev.aries.iijra.module.staff.Staff;
+import dev.aries.iijra.module.user.User;
 
 public record LoginResponse(
 		String token,
-		String staffId,
-		String fullName,
+		Long userId,
 		String email,
 		String role,
 		String status
 ) {
-	public static LoginResponse newResponse(Staff staff, String token) {
+	public static LoginResponse newResponse(User user, String token) {
 		return new LoginResponse(
 				token,
-				staff.getProfile().getId(),
-				staff.getProfile().getFullName(),
-				staff.getEmail(),
-				staff.getRole().name(),
-				staff.getStatus().name()
+				user.getId(),
+				user.getEmail(),
+				user.getRole().name(),
+				user.getStatus().name()
 		);
 	}
 }
