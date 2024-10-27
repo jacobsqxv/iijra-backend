@@ -5,6 +5,7 @@ import dev.aries.iijra.module.auth.LoginRequest;
 import dev.aries.iijra.module.auth.AuthService;
 import dev.aries.iijra.module.auth.ResetPassword;
 import dev.aries.iijra.module.auth.ForgotPassword;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -22,17 +23,17 @@ public class AuthController {
 	private final AuthService authService;
 
 	@PostMapping("/login")
-	public ResponseEntity<Object> authenticate(@RequestBody LoginRequest request) {
+	public ResponseEntity<Object> authenticate(@Valid @RequestBody LoginRequest request) {
 		return Response.success(HttpStatus.OK, authService.login(request));
 	}
 
 	@PostMapping("/password/forgot")
-	public ResponseEntity<Object> forgotPassword(@RequestBody ForgotPassword request) {
+	public ResponseEntity<Object> forgotPassword(@Valid @RequestBody ForgotPassword request) {
 		return Response.success(HttpStatus.OK, authService.forgotPassword(request));
 	}
 
 	@PostMapping("/password/reset")
-	public ResponseEntity<Object> resetPassword(@RequestParam String token, @RequestBody ResetPassword request) {
+	public ResponseEntity<Object> resetPassword(@RequestParam String token, @Valid @RequestBody ResetPassword request) {
 		return Response.success(HttpStatus.OK, authService.resetPassword(token,request));
 	}
 }

@@ -3,6 +3,7 @@ package dev.aries.iijra.controller;
 import dev.aries.iijra.global.Response;
 import dev.aries.iijra.module.department.DepartmentRequest;
 import dev.aries.iijra.module.department.DepartmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,8 @@ public class DepartmentController {
 	private final DepartmentService service;
 
 	@PostMapping
-	@PreAuthorize("hasAnyRole('SYS_ADMIN', 'HOD')")
-	public ResponseEntity<Object> addNewDepartment(@RequestBody DepartmentRequest request) {
+	@PreAuthorize("hasRole('SYS_ADMIN')")
+	public ResponseEntity<Object> addNewDepartment(@Valid @RequestBody DepartmentRequest request) {
 		return Response.success(HttpStatus.CREATED, service.addNewDepartment(request));
 	}
 
@@ -43,6 +44,12 @@ public class DepartmentController {
 	@PreAuthorize("hasRole('SYS_ADMIN')")
 	public ResponseEntity<Object> archiveDepartment(@PathVariable Long id) {
 		return Response.success(HttpStatus.OK, service.archiveDepartment(id));
+	}
+
+	@PutMapping("/{id}/restore")
+	@PreAuthorize("hasRole('SYS_ADMIN')")
+	public ResponseEntity<Object> restoreArchivedDepartment(@PathVariable Long id) {
+		return Response.success(HttpStatus.OK, service.restoreArchivedDepartment(id));
 	}
 
 }
