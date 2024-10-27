@@ -3,7 +3,9 @@ package dev.aries.iijra.module.admin;
 import java.util.Objects;
 
 import dev.aries.iijra.module.user.User;
+import dev.aries.iijra.utility.Auditing;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -43,6 +45,10 @@ public class Admin {
 
 	@Column(nullable = false)
 	private String fullName;
+
+	@Embedded
+	@Column(nullable = false)
+	private Auditing auditing = new Auditing();
 
 	public Admin(User user, String fullName) {
 		this.user = user;
