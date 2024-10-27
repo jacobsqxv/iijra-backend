@@ -5,6 +5,7 @@ import java.util.Objects;
 import dev.aries.iijra.module.department.Department;
 import dev.aries.iijra.module.user.User;
 import dev.aries.iijra.utility.Auditing;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -38,7 +39,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Staff {
 
 	@Id
-	@Column(updatable = false, nullable = false)
+	@Column(updatable = false, nullable = false, unique = true)
 	private String id;
 
 	private String profileImage;
@@ -54,7 +55,7 @@ public class Staff {
 	@ToString.Exclude
 	private User user;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@ToString.Exclude
 	private Department department;
 

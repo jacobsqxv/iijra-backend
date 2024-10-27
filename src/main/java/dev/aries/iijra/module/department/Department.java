@@ -7,6 +7,7 @@ import java.util.Set;
 
 import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.utility.Auditing;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -45,11 +46,11 @@ public class Department {
 	@Column(nullable = false)
 	private String name;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	@ToString.Exclude
 	private Staff hod;
 
-	@OneToMany
+	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	@BatchSize(size = 10)
 	@ToString.Exclude
 	private Set<Staff> staff = new HashSet<>();
