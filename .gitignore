@@ -37,3 +37,6 @@ build/
 
 ### Dummy data ###
 /src/main/java/dev/aries/iijra/data/**
+
+#Disable CircleCI
+.circleci/
