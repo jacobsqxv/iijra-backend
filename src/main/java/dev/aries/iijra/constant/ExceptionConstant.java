@@ -24,6 +24,9 @@ public final class ExceptionConstant {
 	public static final String DEPT_ALREADY_ARCHIVED = "Archiving failed for department with id: ";
 	public static final String USER_NOT_ARCHIVED = "Restore failed for user with id: ";
 	public static final String DEPT_NOT_ARCHIVED = "Restore failed for department with id: ";
+	public static final String FILE_UPLOAD_FAILURE = "There was a problem uploading the file";
+	public static final String FILE_DOWNLOAD_FAILURE = "There was a problem downloading the file";
+	public static final String FILE_DELETE_FAILURE = "There was a problem deleting the file";
 
 	private ExceptionConstant() {
 	}
