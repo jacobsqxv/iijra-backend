@@ -1,15 +1,8 @@
 package dev.aries.iijra.utility;
 
 import dev.aries.iijra.constant.ExceptionConstant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.stereotype.Component;
-
-@Slf4j
-@Component
-@RequiredArgsConstructor
-public class Checks {
+public final class Checks {
 
 	public static <E extends Enum<E>> void checkIfEnumExists(Class<E> enumClass, String request) {
 		try {
@@ -19,4 +12,6 @@ public class Checks {
 			throw new IllegalArgumentException(ExceptionConstant.INVALID_ENUM_VALUE);
 		}
 	}
+
+	private Checks() {}
 }
