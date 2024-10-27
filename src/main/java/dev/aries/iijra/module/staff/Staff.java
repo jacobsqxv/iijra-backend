@@ -5,7 +5,6 @@ import java.util.Objects;
 import dev.aries.iijra.module.department.Department;
 import dev.aries.iijra.module.user.User;
 import dev.aries.iijra.utility.Auditing;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -55,7 +54,7 @@ public class Staff {
 	@ToString.Exclude
 	private User user;
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne
 	@ToString.Exclude
 	private Department department;
 

@@ -8,7 +8,6 @@ import dev.aries.iijra.enums.Status;
 import dev.aries.iijra.module.admin.Admin;
 import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.utility.Auditing;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -44,7 +43,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "_user")
 public class User {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 
 	@Column(nullable = false, unique = true)
@@ -54,11 +53,11 @@ public class User {
 	@ToString.Exclude
 	private String password;
 
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToOne(mappedBy = "user")
 	@ToString.Exclude
 	private Staff staff;
 
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToOne(mappedBy = "user")
 	@ToString.Exclude
 	private Admin admin;
 
