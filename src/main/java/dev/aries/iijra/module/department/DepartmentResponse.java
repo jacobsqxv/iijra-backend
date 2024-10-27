@@ -35,22 +35,12 @@ public record DepartmentResponse(
 		return dept.getStaff().stream().map(StaffResponse::basicResponse).toList();
 	}
 
-	public static DepartmentResponse listResponse(Department dept) {
+	public static DepartmentResponse basicResponse(Department dept) {
 		return DepartmentResponse.builder()
 				.id(dept.getId())
 				.name(dept.getName())
 				.hod(dept.getHod() != null ? dept.getHod().getFullName() : NOT_ASSIGNED)
 				.staff(dept.getHod() != null ? dept.getStaff().size() + 1 : dept.getStaff().size())
-				.createdAt(dept.getAuditing().getCreatedAt())
-				.build();
-	}
-
-	public static DepartmentResponse newResponse(Department dept) {
-		return DepartmentResponse.builder()
-				.id(dept.getId())
-				.name(dept.getName())
-				.hod(NOT_ASSIGNED)
-				.staff(dept.getStaff().size())
 				.createdAt(dept.getAuditing().getCreatedAt())
 				.build();
 	}

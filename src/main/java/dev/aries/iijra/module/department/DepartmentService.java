@@ -7,6 +7,7 @@ import dev.aries.iijra.enums.Role;
 import dev.aries.iijra.module.staff.Staff;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class DepartmentService {
 		Department newDept = new Department(request.name());
 		departmentRepo.save(newDept);
 		log.info("New department added: {}", newDept.getId());
-		return DepartmentResponse.newResponse(newDept);
+		return DepartmentResponse.basicResponse(newDept);
 	}
 
 	private void validateDepartmentName(@NonNull String name) {
@@ -46,7 +47,7 @@ public class DepartmentService {
 	@Transactional(readOnly = true)
 	public List<DepartmentResponse> getAllDepartments() {
 		return departmentRepo.findByIsArchivedFalse().stream()
-				.map(DepartmentResponse::listResponse)
+				.map(DepartmentResponse::basicResponse)
 				.toList();
 	}
 
@@ -139,4 +140,12 @@ public class DepartmentService {
 		}
 	}
 
+	@Transactional
+	public DepartmentResponse updateDepartmentInfo(@NonNull Long id, @Valid DepartmentRequest request) {
+		Department department = getDepartmentById(id);
+		validateDepartmentName(request.name());
+		department.setName(request.name());
+		departmentRepo.save(department);
+		return DepartmentResponse.basicResponse(department);
+	}
 }
