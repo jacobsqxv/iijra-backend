@@ -15,7 +15,8 @@ jobs:
       - restore_cache:
           key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
       - run:
-          command: mvn verify
+          name: Analyze on SonarCloud
+          command: mvn verify sonar:sonar -Dsonar.projectKey=jacobsqxv_iijra-backend
       - store_test_results:
           path: target/surefire-reports
       - save_cache:
@@ -31,10 +32,24 @@ jobs:
       - run:
           name: deploy
           command: '#e.g. ./deploy.sh'
+  build:
+    docker:
+      - image: 'cimg/openjdk:17.0'
+    steps:
+      - checkout
+      - run:
+          name: Analyze on SonarCloud
+          command: mvn verify sonar:sonar -Dsonar.projectKey=jacobsqxv_iijra-backend
+
 workflows:
   build-and-test:
     jobs:
-      - test-java
-    # - deploy:
-    #     requires:
-    #       - test-java
+      - test-java:
+          context: SonarCloud
+  #      - deploy:
+  #          requires:
+  #            - test-java
+#  main:
+#    jobs:
+#      - build:
+#          context: SonarCloud

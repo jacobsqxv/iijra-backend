@@ -1,10 +1,11 @@
-package dev.aries.iijra.module.department;
+package dev.aries.iijra.module.user;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
+import dev.aries.iijra.enums.Role;
+import dev.aries.iijra.enums.Status;
+import dev.aries.iijra.module.admin.Admin;
 import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.utility.Auditing;
 import jakarta.persistence.CascadeType;
@@ -12,19 +13,21 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.proxy.HibernateProxy;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -34,63 +37,65 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @ToString
 @EntityListeners(AuditingEntityListener.class)
-@NamedEntityGraph(name = "Department.staff", attributeNodes = @NamedAttributeNode("staff"))
-@NamedEntityGraph(name = "Department.hod", attributeNodes = @NamedAttributeNode("hod"))
-public class Department {
+@NamedEntityGraph(name = "User.staff", attributeNodes = @NamedAttributeNode("staff"))
+@Table(name = "_user")
+public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false, unique = true)
+	private String email;
+
 	@Column(nullable = false)
-	private String name;
-
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	@ToString.Exclude
-	private Staff hod;
+	private String password;
 
-	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-	@BatchSize(size = 10)
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private Set<Staff> staff = new HashSet<>();
+	private Staff staff;
 
-	@Embedded
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+	@ToString.Exclude
+	private Admin admin;
+
 	@Column(nullable = false)
-	private Auditing auditing = new Auditing();
+	@Enumerated(EnumType.STRING)
+	private Role role;
+
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Status status;
 
 	@Column(nullable = false)
 	private Boolean isArchived;
 
 	private LocalDateTime archivedAt;
 
-	public Department(String name) {
-		this.name = name;
-		this.hod = null;
-		this.staff = new HashSet<>();
+	@Embedded
+	@Column(nullable = false)
+	private Auditing auditing = new Auditing();
+
+	public User(String email, String password, Role role) {
+		this.email = email;
+		this.password = password;
+		this.role = role;
+		this.status = Status.ACTIVE;
 		this.isArchived = false;
 	}
 
 	public void archive() {
+		this.status = Status.INACTIVE;
 		this.isArchived = true;
 		this.archivedAt = LocalDateTime.now();
-		if (this.hod != null) {
-			this.hod.archive();
-		}
-		for (Staff member : this.staff) {
-			member.archive();
-		}
 	}
 
 	public void restore() {
 		this.isArchived = false;
 		this.archivedAt = null;
-		if (this.hod != null) {
-			this.hod.restore();
-		}
-		for (Staff member : this.staff) {
-			member.restore();
-		}
 	}
 
 	@Override
@@ -108,7 +113,7 @@ public class Department {
 		if (!thisEffectiveClass.equals(oEffectiveClass)) {
 			return false;
 		}
-		if (!(o instanceof Department that)) {
+		if (!(o instanceof User that)) {
 			return false;
 		}
 		return getId() != null && Objects.equals(getId(), that.getId());

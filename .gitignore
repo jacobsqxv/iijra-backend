@@ -34,3 +34,6 @@ build/
 /.env
 .editorconfig
 /src/main/resources/certificate/**
+
+### Dummy data ###
+/src/main/java/dev/aries/iijra/data/**

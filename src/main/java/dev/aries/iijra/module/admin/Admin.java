@@ -1,13 +1,9 @@
-package dev.aries.iijra.module.department;
+package dev.aries.iijra.module.admin;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
-import dev.aries.iijra.module.staff.Staff;
+import dev.aries.iijra.module.user.User;
 import dev.aries.iijra.utility.Auditing;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -15,16 +11,14 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedAttributeNode;
-import jakarta.persistence.NamedEntityGraph;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.proxy.HibernateProxy;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -34,63 +28,31 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @ToString
 @EntityListeners(AuditingEntityListener.class)
-@NamedEntityGraph(name = "Department.staff", attributeNodes = @NamedAttributeNode("staff"))
-@NamedEntityGraph(name = "Department.hod", attributeNodes = @NamedAttributeNode("hod"))
-public class Department {
+public class Admin {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@OneToOne
+	@JoinColumn(nullable = false)
+	@ToString.Exclude
+	private User user;
+
+	private String profileImage;
+
 	@Column(nullable = false)
-	private String name;
-
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-	@ToString.Exclude
-	private Staff hod;
-
-	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-	@BatchSize(size = 10)
-	@ToString.Exclude
-	private Set<Staff> staff = new HashSet<>();
+	private String fullName;
 
 	@Embedded
 	@Column(nullable = false)
 	private Auditing auditing = new Auditing();
 
-	@Column(nullable = false)
-	private Boolean isArchived;
-
-	private LocalDateTime archivedAt;
-
-	public Department(String name) {
-		this.name = name;
-		this.hod = null;
-		this.staff = new HashSet<>();
-		this.isArchived = false;
-	}
-
-	public void archive() {
-		this.isArchived = true;
-		this.archivedAt = LocalDateTime.now();
-		if (this.hod != null) {
-			this.hod.archive();
-		}
-		for (Staff member : this.staff) {
-			member.archive();
-		}
-	}
-
-	public void restore() {
-		this.isArchived = false;
-		this.archivedAt = null;
-		if (this.hod != null) {
-			this.hod.restore();
-		}
-		for (Staff member : this.staff) {
-			member.restore();
-		}
+	public Admin(User user, String fullName) {
+		this.user = user;
+		this.fullName = fullName;
 	}
 
 	@Override
@@ -108,7 +70,7 @@ public class Department {
 		if (!thisEffectiveClass.equals(oEffectiveClass)) {
 			return false;
 		}
-		if (!(o instanceof Department that)) {
+		if (!(o instanceof Admin that)) {
 			return false;
 		}
 		return getId() != null && Objects.equals(getId(), that.getId());
