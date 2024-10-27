@@ -6,6 +6,7 @@ import dev.aries.iijra.constant.ExceptionConstant;
 import dev.aries.iijra.enums.Role;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,28 +45,45 @@ public class UserService {
 		}
 	}
 
-	private void checkPassword(String encodedPassword, String rawPassword) {
-		if (passwordEncoder.matches(rawPassword, encodedPassword)) {
-			throw new IllegalArgumentException(ExceptionConstant.PASSWORD_ALREADY_USED);
+	private void checkCurrentPassword(String encodedPassword, String rawPassword) {
+		if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+			throw new IllegalArgumentException(ExceptionConstant.INVALID_CURRENT_PASSWORD);
 		}
 	}
 
-	/**
-	 * Promotes a user to the role of SYS_ADMIN based on their email.
-	 *
-	 * @param email the email of the user to be promoted
-	 * @throws jakarta.persistence.EntityNotFoundException if no user with the given email is found
-	 */
+	private User getUserById(Long id) {
+		return userRepo.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.USER_ID_DOESNT_EXIST + id));
+	}
+
 	@Transactional
-	public void promoteToSysAdmin(String email) {
-		User user = userRepo.findByEmail(email)
-				.orElseThrow(() -> new EntityNotFoundException(
-						ExceptionConstant.USER_EMAIL_DOESNT_EXIST + email));
-		if (user.getStaff() != null) {
-			throw new IllegalStateException("Staff cannot be an admin");
+	public String updatePassword(Long id, @Valid PasswordUpdateRequest request) {
+		User existingUser = getUserById(id);
+		checkCurrentPassword(existingUser.getPassword(), request.currentPassword());
+		existingUser.setPassword(passwordEncoder.encode(request.newPassword()));
+		userRepo.save(existingUser);
+		return "Password updated successfully";
+	}
+
+	@Transactional
+	public String archiveUser(Long id) {
+		User user = getUserById(id);
+		if (Boolean.TRUE.equals(user.getIsArchived())) {
+			throw new IllegalStateException(ExceptionConstant.USER_ALREADY_ARCHIVED + id);
 		}
-		user.setRole(Role.SYS_ADMIN);
+		user.archive();
 		userRepo.save(user);
-		log.info("User: with email {} has been promoted to a SYS_ADMIN", email);
+		return String.format("User %s has been archived", user.getEmail());
+	}
+
+	@Transactional
+	public String restoreArchivedUser(Long id) {
+		User user = getUserById(id);
+		if (Boolean.FALSE.equals(user.getIsArchived())) {
+			throw new IllegalStateException(ExceptionConstant.USER_NOT_ARCHIVED + id);
+		}
+		user.restore();
+		userRepo.save(user);
+		return String.format("User %s has been restored", user.getEmail());
 	}
 }
