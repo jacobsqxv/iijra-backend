@@ -2,6 +2,7 @@ package dev.aries.iijra;
 
 import dev.aries.iijra.enums.Role;
 import dev.aries.iijra.enums.Status;
+import dev.aries.iijra.module.department.Department;
 import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.module.user.User;
 
@@ -18,8 +19,14 @@ public class TestDataFactory {
 	}
 
 	public static Staff newStaff() {
-		return Staff.builder()
-				.id("ST0001")
-				.fullName("John Doe").build();
+		return new Staff(
+				"ST0001",
+				"John Doe",
+				newUser(),
+				newDepartment());
+	}
+
+	public static Department newDepartment() {
+		return new Department("Department");
 	}
 }
