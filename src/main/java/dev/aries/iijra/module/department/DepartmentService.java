@@ -55,19 +55,26 @@ public class DepartmentService {
 		return DepartmentResponse.fullResponse(getDepartmentById(id));
 	}
 
-	/**
-	 * Archives a department by its ID.
-	 *
-	 * @param id the ID of the department to be archived
-	 * @return a message indicating that the department has been archived
-	 * @throws EntityNotFoundException if no department with the given ID is found
-	 */
 	@Transactional
 	public String archiveDepartment(Long id) {
 		Department dept = getDepartmentById(id);
+		if (Boolean.TRUE.equals(dept.getIsArchived())) {
+			throw new IllegalStateException(ExceptionConstant.DEPT_ALREADY_ARCHIVED + id);
+		}
 		dept.archive();
 		departmentRepo.save(dept);
 		return String.format("Department %s has been archived", dept.getName());
+	}
+
+	@Transactional
+	public String restoreArchivedDepartment(Long id) {
+		Department dept = getDepartmentById(id);
+		if (Boolean.FALSE.equals(dept.getIsArchived())) {
+			throw new IllegalStateException(ExceptionConstant.DEPT_NOT_ARCHIVED + id);
+		}
+		dept.restore();
+		departmentRepo.save(dept);
+		return String.format("Department %s has been restored", dept.getName());
 	}
 
 	public Department getDepartmentById(Long id) {

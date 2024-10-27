@@ -38,7 +38,8 @@ public class StaffService {
 		Department department = departmentService.getDepartmentById(request.departmentId());
 
 		Staff newStaff = createStaff(request, department);
-		assignDepartmentPosition(newStaff, request.isHod(), false);
+		staffRepo.save(newStaff);
+		assignDepartmentPosition(newStaff, request.isHod());
 
 		return StaffResponse.fullResponse(newStaff);
 	}
@@ -46,26 +47,23 @@ public class StaffService {
 
 	private Staff createStaff(StaffRequest request, Department department) {
 		User newUser = userService.createUser(request.email(), Role.STAFF);
-		String staffId = formatStaffId(newUser.getId(), 4);
-		Staff newStaff = new Staff(
+		String staffId = formatStaffId(newUser.getId());
+		return new Staff(
 				staffId,
 				request.fullName(),
 				newUser,
 				department);
-		staffRepo.save(newStaff);
-		return staffRepo.save(newStaff);
 	}
 
 	/**
 	 * Assigns a department position to a staff member.
 	 *
-	 * @param staff    the staff member to be assigned a position
-	 * @param isHod    flag indicating if the staff member is to be assigned as Head of Department (HOD)
-	 * @param isUpdate flag indicating if this is an update to the current HOD
+	 * @param staff the staff member to be assigned a position
+	 * @param isHod flag indicating if the staff member is to be assigned as Head of Department (HOD)
 	 */
-	private void assignDepartmentPosition(Staff staff, Boolean isHod, Boolean isUpdate) {
+	private void assignDepartmentPosition(Staff staff, Boolean isHod) {
 		if (Boolean.TRUE.equals(isHod)) {
-			departmentService.assignHod(staff, isUpdate);
+			departmentService.assignHod(staff, false);
 		} else {
 			departmentService.addStaffMember(staff);
 		}
@@ -80,7 +78,7 @@ public class StaffService {
 				.map(StaffResponse::fullResponse);
 	}
 
-	private String formatStaffId(Long id, int length) {
-		return String.format("ST%0" + length + "d", id);
+	private String formatStaffId(Long id) {
+		return String.format("ST%04d", id);
 	}
 }

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface StaffRepository extends JpaRepository<Staff, Long>, JpaSpecificationExecutor<Staff> {
+public interface StaffRepository extends JpaRepository<Staff, String>, JpaSpecificationExecutor<Staff> {
 
 	@EntityGraph(attributePaths = {"department", "user"})
 	default Page<Staff> findAll(GetStaffPage request, Pageable pageable) {
