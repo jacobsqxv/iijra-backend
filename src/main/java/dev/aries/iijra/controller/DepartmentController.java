@@ -40,6 +40,11 @@ public class DepartmentController {
 		return Response.success(HttpStatus.OK, service.getDepartment(id));
 	}
 
+	@PutMapping("/{id}")
+	public ResponseEntity<Object> updateDepartmentInfo(@PathVariable Long id, @Valid @RequestBody DepartmentRequest request) {
+		return Response.success(HttpStatus.OK, service.updateDepartmentInfo(id, request));
+	}
+
 	@PutMapping("/{id}/archive")
 	@PreAuthorize("hasRole('SYS_ADMIN')")
 	public ResponseEntity<Object> archiveDepartment(@PathVariable Long id) {

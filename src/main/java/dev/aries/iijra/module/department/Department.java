@@ -46,11 +46,11 @@ public class Department {
 	@Column(nullable = false)
 	private String name;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
 	@ToString.Exclude
 	private Staff hod;
 
-	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
 	@BatchSize(size = 10)
 	@ToString.Exclude
 	private Set<Staff> staff = new HashSet<>();

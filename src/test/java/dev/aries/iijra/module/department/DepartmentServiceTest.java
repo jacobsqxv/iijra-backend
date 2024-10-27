@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import dev.aries.iijra.TestDataFactory;
 import dev.aries.iijra.constant.ExceptionConstant;
+import dev.aries.iijra.module.staff.Staff;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,6 +85,8 @@ class DepartmentServiceTest {
 		void getDepartment_WithExistingId_Success() {
 			testDepartment = TestDataFactory.newDepartment();
 			testDepartment.setId(TEST_DEPT_ID);
+			testDepartment.setHod(TestDataFactory.newStaff());
+			testDepartment.getStaff().add(TestDataFactory.newStaff());
 
 			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
 
@@ -128,7 +131,11 @@ class DepartmentServiceTest {
 	class ArchiveDepartmentTests {
 		@BeforeEach
 		void setUp() {
+			Staff testHod = TestDataFactory.newStaff();
+			Staff testStaff = TestDataFactory.newStaff();
 			testDepartment = TestDataFactory.newDepartment();
+			testDepartment.setHod(testHod);
+			testDepartment.getStaff().add(testStaff);
 		}
 
 		@Test
@@ -161,14 +168,22 @@ class DepartmentServiceTest {
 	@Nested
 	@DisplayName("Restore archived department tests")
 	class RestoreDepartmentTests {
+		private Staff testHod;
+		private Staff testStaff;
 		@BeforeEach
 		void setUp() {
+			testHod = TestDataFactory.newStaff();
+			testStaff = TestDataFactory.newStaff();
 			testDepartment = TestDataFactory.newDepartment();
+			testDepartment.setHod(testHod);
+			testDepartment.getStaff().add(testStaff);
 		}
 
 		@Test
 		@DisplayName("Should successfully restore archived department when already archived")
 		void restoreArchivedDepartment_WithValidDeptId_SuccessTest() {
+			testHod.archive();
+			testStaff.archive();
 			testDepartment.setIsArchived(true);
 
 			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
@@ -190,6 +205,34 @@ class DepartmentServiceTest {
 					() -> departmentService.restoreArchivedDepartment(TEST_DEPT_ID));
 			assertTrue(ex.getMessage().contains(ExceptionConstant.DEPT_NOT_ARCHIVED));
 			assertTrue(ex.getMessage().contains(TEST_DEPT_ID.toString()));
+		}
+	}
+
+	@Nested
+	@DisplayName("Update department tests")
+	class UpdateDepartmentTests {
+		private DepartmentRequest testRequest;
+
+		@BeforeEach
+		void setUp() {
+			testRequest = new DepartmentRequest("Update department");
+		}
+
+		@Test
+		@DisplayName("Should update department if exists and new name is valid")
+		void updateDepartment_IfIdExists_Success() {
+			testDepartment = TestDataFactory.newDepartment();
+			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
+			when(departmentRepo.existsByName(testRequest.name())).thenReturn(false);
+
+			DepartmentResponse response = departmentService.updateDepartmentInfo(TEST_DEPT_ID,testRequest);
+
+			ArgumentCaptor<Department> deptCaptor = ArgumentCaptor.forClass(Department.class);
+			verify(departmentRepo).save(deptCaptor.capture());
+			Department savedDept = deptCaptor.getValue();
+
+			assertEquals(savedDept.getId(), response.id());
+			assertEquals(savedDept.getName(), response.name());
 		}
 	}
 }
