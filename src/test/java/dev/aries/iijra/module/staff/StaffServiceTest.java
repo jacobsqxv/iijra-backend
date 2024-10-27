@@ -1,6 +1,7 @@
 package dev.aries.iijra.module.staff;
 
 import java.util.List;
+import java.util.Optional;
 
 import dev.aries.iijra.TestDataFactory;
 import dev.aries.iijra.constant.ExceptionConstant;
@@ -10,6 +11,7 @@ import dev.aries.iijra.module.department.DepartmentService;
 import dev.aries.iijra.module.user.User;
 import dev.aries.iijra.module.user.UserService;
 import dev.aries.iijra.search.GetStaffPage;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -165,6 +168,33 @@ class StaffServiceTest {
 
 			assertNotNull(ex);
 			assertEquals(ExceptionConstant.INVALID_ENUM_VALUE, ex.getMessage());
+		}
+
+		@Test
+		@DisplayName("Should return staff when id is valid")
+		void getStaff_WithValidId_Success() {
+			Long staffId = 1L;
+			when(staffRepo.findById(any(String.class))).thenReturn(Optional.of(testStaff1));
+
+			StaffResponse response = staffService.getStaffById(staffId);
+
+			verify(staffRepo, times(1)).findById(any(String.class));
+			assertNotNull(response);
+			assertTrue(response.staffId().contains("ST"));
+		}
+
+		@Test
+		@DisplayName("Should throw exception when staff does not exist")
+		void getStaff_WithInvalidId_ThrowException() {
+			Long staffId = 1L;
+			when(staffRepo.findById(any(String.class))).thenReturn(Optional.empty());
+
+			EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+					() -> staffService.getStaffById(staffId));
+
+			verify(staffRepo, times(1)).findById(any(String.class));
+			assertNotNull(ex);
+			assertTrue(ex.getMessage().contains(ExceptionConstant.STAFF_ID_DOESNT_EXIST));
 		}
 	}
 }

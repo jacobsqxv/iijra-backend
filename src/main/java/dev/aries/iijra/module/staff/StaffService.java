@@ -1,5 +1,6 @@
 package dev.aries.iijra.module.staff;
 
+import dev.aries.iijra.constant.ExceptionConstant;
 import dev.aries.iijra.enums.Role;
 import dev.aries.iijra.enums.Status;
 import dev.aries.iijra.module.department.Department;
@@ -9,6 +10,7 @@ import dev.aries.iijra.module.user.UserService;
 import dev.aries.iijra.search.GetStaffPage;
 import dev.aries.iijra.utility.Checks;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,5 +82,15 @@ public class StaffService {
 
 	private String formatStaffId(Long id) {
 		return String.format("ST%04d", id);
+	}
+
+	public StaffResponse getStaffById(Long id) {
+		String staffId = formatStaffId(id);
+		return StaffResponse.fullResponse(getStaff(staffId));
+	}
+
+	private Staff getStaff(String staffId) {
+		return staffRepo.findById(staffId)
+				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.STAFF_ID_DOESNT_EXIST + staffId));
 	}
 }
