@@ -35,5 +35,6 @@ build/
 .editorconfig
 /src/main/resources/certificate/**
 
-### Dummy data ###
+### Dev Profile Files ###
 /src/main/java/dev/aries/iijra/data/**
+src/main/resources/application-dev.properties
