@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import dev.aries.iijra.exception.FileConversionException;
@@ -53,8 +52,8 @@ public class S3Utils {
 	private File convertMultiPartToFile(MultipartFile file) {
 		try {
 			// Use a temporary directory to store the file
-			Path tempDir = Files.createTempDirectory("uploaded-files-");
-			Path tempFilePath = tempDir.resolve(Objects.requireNonNull(file.getOriginalFilename()));
+			Path tempDir = Files.createTempDirectory("uploaded-files");
+			Path tempFilePath = tempDir.resolve(UUID.randomUUID().toString());
 
 			// Write the file to the temporary location
 			Files.write(tempFilePath, file.getBytes());
