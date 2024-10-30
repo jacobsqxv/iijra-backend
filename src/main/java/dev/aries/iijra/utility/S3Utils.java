@@ -104,7 +104,7 @@ public class S3Utils {
 		String uploadId = createMultipartUploadResponse.uploadId();
 
 		File convertedFile = convertMultiPartToFile(file);
-		List<CompletedPart> completedParts = new ArrayList<>();
+		List<CompletedPart> completedParts;
 
 		try {
 			// Upload parts
@@ -124,7 +124,8 @@ public class S3Utils {
 			abortMultipartUpload(key, uploadId);
 			throw new S3UploadException(e);
 		} finally {
-			convertedFile.delete();
+			boolean delete = convertedFile.delete();
+			log.info("File delete status: {}", delete);
 		}
 	}
 
