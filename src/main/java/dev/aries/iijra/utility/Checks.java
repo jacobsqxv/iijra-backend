@@ -1,5 +1,7 @@
 package dev.aries.iijra.utility;
 
+import java.util.function.Consumer;
+
 import dev.aries.iijra.constant.ExceptionConstant;
 
 public final class Checks {
@@ -11,6 +13,14 @@ public final class Checks {
 		catch (IllegalArgumentException ex) {
 			throw new IllegalArgumentException(ExceptionConstant.INVALID_ENUM_VALUE);
 		}
+	}
+
+	public static <T> void updateField(Consumer<T> setter, T currVal, T newVal) {
+		if (newVal == null || newVal.equals(currVal)) {
+			return;
+		}
+
+		setter.accept(newVal);
 	}
 
 	private Checks() {}

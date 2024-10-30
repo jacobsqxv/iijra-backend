@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import dev.aries.iijra.exception.FileConversionException;
+import dev.aries.iijra.exception.S3UploadException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -36,14 +38,6 @@ public class S3Utils {
 	@Value("${aws.region}")
 	private String region;
 
-	private File convertMultiPartToFile(MultipartFile file) throws IOException {
-		File convertedFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
-		try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
-			fos.write(file.getBytes());
-		}
-		return convertedFile;
-	}
-
 	public static String generateUniqueKey(MultipartFile file, String fileName) {
 		String originalFilename = file.getOriginalFilename();
 		String extension = "";
@@ -55,10 +49,21 @@ public class S3Utils {
 		return UUID.randomUUID() + "-" + fileName + extension;
 	}
 
+	private File convertMultiPartToFile(MultipartFile file) {
+		File convertedFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+		try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
+			fos.write(file.getBytes());
+		} catch (IOException e) {
+			log.info("Error converting multipart file");
+			throw new FileConversionException(e);
+		}
+		return convertedFile;
+	}
+
 	public String generateFileUrl(String key) {
 		// Option 1: Using the S3 URL pattern
 		String fileUrlFormat = "https://%s.s3.%s.amazonaws.com/%s";
-		return String.format(fileUrlFormat, bucketName, region , key);
+		return String.format(fileUrlFormat, bucketName, region, key);
 
 	}
 
@@ -72,17 +77,21 @@ public class S3Utils {
 		}
 	}
 
-	public void uploadSmallFile(MultipartFile file, String key) throws IOException {
+	public void uploadSmallFile(MultipartFile file, String key) {
 		PutObjectRequest request = PutObjectRequest.builder()
 				.bucket(bucketName)
 				.key(key)
 				.contentType(file.getContentType())
 				.build();
-
-		s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+		try {
+			s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+		} catch (IOException e) {
+			throw new S3UploadException(e);
+		}
 	}
 
-	public void uploadLargeFile(MultipartFile file, String key) throws IOException {
+	@SuppressWarnings({"java:S4042", "java:S899"})
+	public void uploadLargeFile(MultipartFile file, String key) {
 		// Create multipart upload request
 		CreateMultipartUploadRequest createMultipartUploadRequest = CreateMultipartUploadRequest.builder()
 				.bucket(bucketName)
@@ -113,13 +122,13 @@ public class S3Utils {
 			s3Client.completeMultipartUpload(completeMultipartUploadRequest);
 		} catch (Exception e) {
 			abortMultipartUpload(key, uploadId);
-			throw e;
+			throw new S3UploadException(e);
 		} finally {
 			convertedFile.delete();
 		}
 	}
 
-	private List<CompletedPart> uploadParts(File file, String uploadId, String key) throws IOException {
+	private List<CompletedPart> uploadParts(File file, String uploadId, String key) {
 		List<CompletedPart> completedParts = new ArrayList<>();
 		long partSize = 5L * 1024 * 1024; // 5MB part size
 
@@ -154,6 +163,8 @@ public class S3Utils {
 				position += contentLength;
 				partNumber++;
 			}
+		} catch (IOException e) {
+			throw new S3UploadException(e);
 		}
 		return completedParts;
 	}
