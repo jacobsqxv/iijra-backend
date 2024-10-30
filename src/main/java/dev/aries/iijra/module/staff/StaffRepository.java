@@ -1,5 +1,8 @@
 package dev.aries.iijra.module.staff;
 
+import java.util.List;
+import java.util.Optional;
+
 import dev.aries.iijra.search.GetStaffPage;
 
 import org.springframework.data.domain.Page;
@@ -14,5 +17,9 @@ public interface StaffRepository extends JpaRepository<Staff, String>, JpaSpecif
 	default Page<Staff> findAll(GetStaffPage request, Pageable pageable) {
 		return findAll(StaffSpecification.buildSpecification(request, false), pageable);
 	}
+	@EntityGraph(attributePaths = {"department", "user"})
+	Optional<Staff> findByDepartmentIdAndIsHodTrue(Long departmentId);
 
+	@EntityGraph(attributePaths = {"department", "user"}, type = EntityGraph.EntityGraphType.LOAD)
+	List<Staff> findAllByDepartmentId(Long departmentId);
 }

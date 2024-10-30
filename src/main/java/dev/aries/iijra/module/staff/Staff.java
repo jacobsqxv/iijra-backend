@@ -5,6 +5,7 @@ import java.util.Objects;
 import dev.aries.iijra.module.department.Department;
 import dev.aries.iijra.module.user.User;
 import dev.aries.iijra.utility.Auditing;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -33,8 +34,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @ToString
 @EntityListeners(AuditingEntityListener.class)
-@NamedEntityGraph(name = "Staff.user", attributeNodes = @NamedAttributeNode("user"))
-@NamedEntityGraph(name = "Staff.department", attributeNodes = @NamedAttributeNode("department"))
 public class Staff {
 
 	@Id
@@ -54,7 +53,7 @@ public class Staff {
 	@ToString.Exclude
 	private User user;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@ToString.Exclude
 	private Department department;
 
@@ -71,14 +70,6 @@ public class Staff {
 		this.user = user;
 		this.department = department;
 		this.isHod = false;
-	}
-
-	public void archive() {
-		this.user.archive();
-	}
-
-	public void restore() {
-		this.user.restore();
 	}
 
 	@Override

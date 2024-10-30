@@ -34,9 +34,12 @@ class DepartmentServiceTest {
 	@InjectMocks
 	private DepartmentService departmentService;
 	@Mock
+	private DepartmentStaff deptStaff;
+	@Mock
 	private DepartmentRepository departmentRepo;
 
 	private Department testDepartment;
+	private DepartmentResponse.DepartmentStaff deptStaffResponse;
 
 	@Nested
 	@DisplayName("Add department tests")
@@ -61,7 +64,6 @@ class DepartmentServiceTest {
 
 			assertEquals(savedDept.getId(), response.id());
 			assertEquals(savedDept.getName(), response.name());
-			assertEquals(savedDept.getStaff().size(), response.staff());
 		}
 
 		@Test
@@ -80,14 +82,23 @@ class DepartmentServiceTest {
 	@Nested
 	@DisplayName("Get department(s) tests")
 	class GetDepartmentTests {
+		private Department testDept2;
+
+		@BeforeEach
+		void setUp() {
+			testDepartment = TestDataFactory.newDepartment();
+			testDepartment.setId(1L);
+			testDept2 = TestDataFactory.newDepartment();
+			testDept2.setId(2L);
+		}
+
 		@Test
 		@DisplayName("Should successfully return department if ID exists")
 		void getDepartment_WithExistingId_Success() {
-			testDepartment = TestDataFactory.newDepartment();
-			testDepartment.setId(TEST_DEPT_ID);
-			testDepartment.setHod(TestDataFactory.newStaff());
-			testDepartment.getStaff().add(TestDataFactory.newStaff());
-
+			Staff hod = TestDataFactory.newStaff();
+			List<Staff> staff = List.of(TestDataFactory.newStaff());
+			deptStaffResponse = new DepartmentResponse.DepartmentStaff(hod, staff);
+			when(deptStaff.getDepartmentStaff(any(Long.class))).thenReturn(deptStaffResponse);
 			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
 
 			DepartmentResponse response = departmentService.getDepartment(TEST_DEPT_ID);
@@ -110,13 +121,11 @@ class DepartmentServiceTest {
 		@Test
 		@DisplayName("Should successfully return list of departments")
 		void getDepartments_Success() {
-			Department testDept1 = TestDataFactory.newDepartment();
-			testDept1.setId(1L);
-			Department testDept2 = TestDataFactory.newDepartment();
-			testDept1.setId(2L);
-
-			List<Department> testDepartments = List.of(testDept1, testDept2);
-
+			List<Department> testDepartments = List.of(testDepartment, testDept2);
+			Staff hod = TestDataFactory.newStaff();
+			List<Staff> staff = List.of(TestDataFactory.newStaff());
+			deptStaffResponse = new DepartmentResponse.DepartmentStaff(hod, staff);
+			when(deptStaff.getDepartmentStaff(any(Long.class))).thenReturn(deptStaffResponse);
 			when(departmentRepo.findByIsArchivedFalse()).thenReturn(testDepartments);
 
 			List<DepartmentResponse> response = departmentService.getAllDepartments();
@@ -131,11 +140,7 @@ class DepartmentServiceTest {
 	class ArchiveDepartmentTests {
 		@BeforeEach
 		void setUp() {
-			Staff testHod = TestDataFactory.newStaff();
-			Staff testStaff = TestDataFactory.newStaff();
 			testDepartment = TestDataFactory.newDepartment();
-			testDepartment.setHod(testHod);
-			testDepartment.getStaff().add(testStaff);
 		}
 
 		@Test
@@ -168,22 +173,16 @@ class DepartmentServiceTest {
 	@Nested
 	@DisplayName("Restore archived department tests")
 	class RestoreDepartmentTests {
-		private Staff testHod;
-		private Staff testStaff;
+
 		@BeforeEach
 		void setUp() {
-			testHod = TestDataFactory.newStaff();
-			testStaff = TestDataFactory.newStaff();
+
 			testDepartment = TestDataFactory.newDepartment();
-			testDepartment.setHod(testHod);
-			testDepartment.getStaff().add(testStaff);
 		}
 
 		@Test
 		@DisplayName("Should successfully restore archived department when already archived")
 		void restoreArchivedDepartment_WithValidDeptId_SuccessTest() {
-			testHod.archive();
-			testStaff.archive();
 			testDepartment.setIsArchived(true);
 
 			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
@@ -225,7 +224,7 @@ class DepartmentServiceTest {
 			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
 			when(departmentRepo.existsByName(testRequest.name())).thenReturn(false);
 
-			DepartmentResponse response = departmentService.updateDepartmentInfo(TEST_DEPT_ID,testRequest);
+			DepartmentResponse response = departmentService.updateDepartmentInfo(TEST_DEPT_ID, testRequest);
 
 			ArgumentCaptor<Department> deptCaptor = ArgumentCaptor.forClass(Department.class);
 			verify(departmentRepo).save(deptCaptor.capture());
