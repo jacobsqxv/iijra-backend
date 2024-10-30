@@ -132,6 +132,15 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
+                <configuration>
+                    <excludes>
+                        <exclude>dev.aries.iijra.IijraBackendApplicationTests.java</exclude>
+                        <exclude>dev.aries.iijra.exception</exclude>
+                        <exclude>dev.aries.iijra.config</exclude>
+                        <exclude>dev.aries.iijra.constant</exclude>
+                        <exclude>dev.aries.iijra.enums</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
