@@ -1,10 +1,8 @@
-package dev.aries.iijra.controller;
+package dev.aries.iijra.module.user;
 
 import dev.aries.iijra.global.Response;
 import dev.aries.iijra.module.admin.AdminRequest;
 import dev.aries.iijra.module.admin.AdminService;
-import dev.aries.iijra.module.user.PasswordUpdateRequest;
-import dev.aries.iijra.module.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
