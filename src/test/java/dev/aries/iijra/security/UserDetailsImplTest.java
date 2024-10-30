@@ -72,7 +72,7 @@ class UserDetailsImplTest {
 	}
 
 	@Test
-	@DisplayName("Should return true when isArchived is set to true")
+	@DisplayName("Should return true when isArchived is set to false")
 	void isEnabled_WhenIsActive_ShouldReturnTrue() {
 		user.setIsArchived(false);
 
@@ -80,9 +80,10 @@ class UserDetailsImplTest {
 	}
 
 	@Test
-	@DisplayName("Should return false when isArchived is set to false")
+	@DisplayName("Should return false when isArchived is set to true")
 	void isEnabled_WhenNotIsActive_ShouldReturnFalse() {
 		user.setIsArchived(true);
+		userDetails = new UserDetailsImpl(user);
 
 		assertFalse(userDetails.isEnabled());
 	}
