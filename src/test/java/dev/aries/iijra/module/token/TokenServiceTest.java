@@ -70,15 +70,10 @@ class TokenServiceTest {
 		@DisplayName("Should clean up previous tokens when adding new token")
 		void addNewToken_ShouldCleanUpPreviousTokens() {
 			TokenType type = TokenType.PASSWORD_RESET;
-			List<Token> previousTokens = Arrays.asList(
-					new Token(testUser, TEST_TOKEN_VALUE, type, LocalDateTime.now().minusMinutes(3)),
-					new Token(testUser, TEST_TOKEN_VALUE, type, LocalDateTime.now().minusMinutes(1))
-			);
-			when(tokenRepo.findByUserAndType(testUser, type)).thenReturn(previousTokens);
 
 			tokenService.addNewToken(testUser, type);
 
-			verify(tokenRepo).deleteAll(previousTokens);
+			verify(tokenRepo).deleteAllByUserAndType(testUser, type);
 			verify(tokenRepo).save(any(Token.class));
 		}
 

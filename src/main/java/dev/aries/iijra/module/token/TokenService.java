@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -21,6 +22,7 @@ public class TokenService {
 	private final TokenRepository tokenRepo;
 	private final SecureRandom secureRandom = new SecureRandom();
 
+	@Transactional
 	public void addNewToken(User user, TokenType type) {
 		cleanUpPreviousToken(user, type);
 		String value = generateToken();
@@ -35,7 +37,7 @@ public class TokenService {
 	}
 
 	private void cleanUpPreviousToken(User user, TokenType type) {
-		tokenRepo.deleteAll(tokenRepo.findByUserAndType(user, type));
+		tokenRepo.deleteAllByUserAndType(user, type);
 	}
 
 	private String generateToken() {

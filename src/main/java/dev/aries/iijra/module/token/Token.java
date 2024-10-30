@@ -35,22 +35,26 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @ToString
 @EntityListeners(AuditingEntityListener.class)
-@NamedEntityGraph(name = "Token.user", attributeNodes = @NamedAttributeNode("user"))
 public class Token {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@ManyToOne
 	@JoinColumn(nullable = false)
 	@ToString.Exclude
 	private User user;
+
 	@Column(nullable = false)
 	private String value;
+
 	@Column(nullable = false)
 	private LocalDateTime expiresAt;
+
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private TokenType type;
+
 	@Embedded
 	@Column(nullable = false)
 	private Auditing auditing = new Auditing();
