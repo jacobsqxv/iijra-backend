@@ -16,14 +16,18 @@ public final class ExceptionConstant {
 	public static final String ACCOUNT_DISABLED = "Cannot log in at this time, account has been disabled";
 	public static final String ACCOUNT_DEACTIVATED = "Cannot log in at this time, account has been deactivated";
 	public static final String INVALID_REQUEST = "There was a problem with the request";
-	public static final String ACCESS_DENIED = "Access denied: Not authorized to access resource";
-	public static final String INVALID_CREDENTIALS = "Authentication failed: Invalid credentials";
+	public static final String ACCESS_DENIED = "Not authorized to access resource";
+	public static final String INVALID_CREDENTIALS = "Invalid email or password";
 	public static final String INVALID_TOKEN = "Token is invalid or has expired";
 	public static final String INVALID_ENUM_VALUE = "Invalid enum value provided";
 	public static final String USER_ALREADY_ARCHIVED = "Archiving failed for user with id: ";
 	public static final String DEPT_ALREADY_ARCHIVED = "Archiving failed for department with id: ";
 	public static final String USER_NOT_ARCHIVED = "Restore failed for user with id: ";
 	public static final String DEPT_NOT_ARCHIVED = "Restore failed for department with id: ";
+	public static final String FILE_UPLOAD_FAILURE = "There was a problem uploading the file";
+	public static final String FILE_DOWNLOAD_FAILURE = "There was a problem downloading the file";
+	public static final String FILE_DELETE_FAILURE = "There was a problem deleting the file";
+	public static final String FILE_CONVERSION_FAILURE = "Multipart file conversion failed";
 
 	private ExceptionConstant() {
 	}

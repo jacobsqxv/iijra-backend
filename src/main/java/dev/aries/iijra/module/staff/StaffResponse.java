@@ -12,6 +12,7 @@ public record StaffResponse(
 		String profileImage,
 		String fullName,
 		String email,
+		String bio,
 		String department,
 		String position,
 		String status,
@@ -24,6 +25,7 @@ public record StaffResponse(
 				staff.getProfileImage(),
 				staff.getFullName(),
 				staff.getUser().getEmail(),
+				staff.getBio(),
 				staff.getDepartment().getName(),
 				returnPosition(staff),
 				staff.getUser().getStatus().name(),
@@ -36,7 +38,6 @@ public record StaffResponse(
 				.staffId(staff.getId())
 				.profileImage(staff.getProfileImage())
 				.fullName(staff.getFullName())
-				.email(staff.getUser().getEmail())
 				.build();
 	}
 

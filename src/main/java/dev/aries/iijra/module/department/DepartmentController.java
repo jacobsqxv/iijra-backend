@@ -1,8 +1,6 @@
-package dev.aries.iijra.controller;
+package dev.aries.iijra.module.department;
 
 import dev.aries.iijra.global.Response;
-import dev.aries.iijra.module.department.DepartmentRequest;
-import dev.aries.iijra.module.department.DepartmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

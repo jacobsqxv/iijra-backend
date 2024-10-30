@@ -1,10 +1,6 @@
-package dev.aries.iijra.controller;
+package dev.aries.iijra.module.auth;
 
 import dev.aries.iijra.global.Response;
-import dev.aries.iijra.module.auth.LoginRequest;
-import dev.aries.iijra.module.auth.AuthService;
-import dev.aries.iijra.module.auth.ResetPassword;
-import dev.aries.iijra.module.auth.ForgotPassword;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -27,13 +23,13 @@ public class AuthController {
 		return Response.success(HttpStatus.OK, authService.login(request));
 	}
 
-	@PostMapping("/password/forgot")
+	@PostMapping("/forgot-password")
 	public ResponseEntity<Object> forgotPassword(@Valid @RequestBody ForgotPassword request) {
 		return Response.success(HttpStatus.OK, authService.forgotPassword(request));
 	}
 
-	@PostMapping("/password/reset")
+	@PostMapping("/reset-password")
 	public ResponseEntity<Object> resetPassword(@RequestParam String token, @Valid @RequestBody ResetPassword request) {
-		return Response.success(HttpStatus.OK, authService.resetPassword(token,request));
+		return Response.success(HttpStatus.OK, authService.resetPassword(token, request));
 	}
 }

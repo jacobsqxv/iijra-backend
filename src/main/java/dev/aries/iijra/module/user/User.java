@@ -17,8 +17,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.NamedAttributeNode;
-import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -39,7 +37,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @ToString
 @EntityListeners(AuditingEntityListener.class)
-@NamedEntityGraph(name = "User.staff", attributeNodes = @NamedAttributeNode("staff"))
 @Table(name = "_user")
 public class User {
 	@Id
