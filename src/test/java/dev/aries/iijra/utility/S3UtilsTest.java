@@ -125,7 +125,6 @@ class S3UtilsTest {
 	@DisplayName("Should successfully upload file in parts if bigger than 5MB")
 	void testUploadLargeFile() throws IOException {
 		MultipartFile file = mock(MultipartFile.class);
-		when(file.getOriginalFilename()).thenReturn("test.txt");
 		when(file.getContentType()).thenReturn("text/plain");
 		when(file.getBytes()).thenReturn("test content".getBytes());
 
@@ -150,7 +149,6 @@ class S3UtilsTest {
 	@DisplayName("Should throw exception when upload in parts fail")
 	void testUploadLargeFileThrowsException() throws IOException {
 		MultipartFile file = mock(MultipartFile.class);
-		when(file.getOriginalFilename()).thenReturn("test.txt");
 		when(file.getContentType()).thenReturn("text/plain");
 		when(file.getBytes()).thenReturn("test content".getBytes());
 
