@@ -1,9 +1,10 @@
 package dev.aries.iijra.utility;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,26 +46,29 @@ public class S3Utils {
 		if (originalFilename != null && originalFilename.contains(".")) {
 			extension = originalFilename.substring(originalFilename.lastIndexOf("."));
 		}
-		// Generate new filename with UUID and custom name
 		return UUID.randomUUID() + "-" + fileName + extension;
 	}
 
+	@SuppressWarnings("java:S5443")
 	private File convertMultiPartToFile(MultipartFile file) {
-		File convertedFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
-		try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
-			fos.write(file.getBytes());
+		try {
+			// Use a temporary directory to store the file
+			Path tempDir = Files.createTempDirectory("uploaded-files-");
+			Path tempFilePath = tempDir.resolve(Objects.requireNonNull(file.getOriginalFilename()));
+
+			// Write the file to the temporary location
+			Files.write(tempFilePath, file.getBytes());
+
+			return tempFilePath.toFile();
 		} catch (IOException e) {
 			log.info("Error converting multipart file");
 			throw new FileConversionException(e);
 		}
-		return convertedFile;
 	}
 
 	public String generateFileUrl(String key) {
-		// Option 1: Using the S3 URL pattern
 		String fileUrlFormat = "https://%s.s3.%s.amazonaws.com/%s";
 		return String.format(fileUrlFormat, bucketName, region, key);
-
 	}
 
 	public boolean isMultipartUploadRequired(long fileSize) {
