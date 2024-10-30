@@ -1,6 +1,5 @@
 package dev.aries.iijra.module.staff;
 
-import java.util.List;
 import java.util.Objects;
 
 import dev.aries.iijra.constant.ExceptionConstant;
@@ -107,6 +106,7 @@ public class StaffService {
 		return staffRepo.findByDepartmentIdAndIsHodTrue(departmentId)
 				.orElse(null);
 	}
+
 	private Staff getStaff(Long id) {
 		String staffId = formatStaffId(id);
 		return staffRepo.findById(staffId)
