@@ -11,6 +11,7 @@ import dev.aries.iijra.module.token.TokenService;
 import dev.aries.iijra.module.user.User;
 import dev.aries.iijra.module.user.UserRepository;
 import dev.aries.iijra.security.JwtService;
+import dev.aries.iijra.security.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -62,11 +63,10 @@ class AuthServiceTest {
 		void login_WithExistingUser_SuccessTest() {
 			LoginRequest loginRequest = new LoginRequest("test@email.com", "Test123");
 			testUser = TestDataFactory.newUser();
-			when(userRepo.findByEmail(loginRequest.email()))
-					.thenReturn(Optional.of(testUser));
+			UserDetailsImpl userDetails = new UserDetailsImpl(testUser);
 
 			Authentication auth = new UsernamePasswordAuthenticationToken(
-					loginRequest.email(), loginRequest.password()
+					userDetails, loginRequest.password()
 			);
 			when(authManager.authenticate(any(Authentication.class)))
 					.thenReturn(auth);
@@ -80,7 +80,6 @@ class AuthServiceTest {
 			assertNotNull(response.token());
 			assertEquals(loginRequest.email(), response.email());
 
-			verify(userRepo, times(1)).findByEmail(loginRequest.email());
 			verify(authManager, times(1)).authenticate(any(Authentication.class));
 			verify(jwtService, times(1)).generateToken(auth);
 		}
@@ -90,14 +89,12 @@ class AuthServiceTest {
 		void login_WithInvalidCredentials_ShouldThrowException() {
 			LoginRequest loginRequest = new LoginRequest("test@email.com", "Test123");
 			testUser = TestDataFactory.newUser();
-			when(userRepo.findByEmail(loginRequest.email()))
-					.thenReturn(Optional.of(testUser));
+
 			when(authManager.authenticate(any(Authentication.class)))
 					.thenThrow(new BadCredentialsException(ExceptionConstant.INVALID_CREDENTIALS));
 
 			assertThrows(BadCredentialsException.class, () -> authService.login(loginRequest));
 
-			verify(userRepo, times(1)).findByEmail(loginRequest.email());
 			verify(authManager, times(1)).authenticate(any(Authentication.class));
 			verify(jwtService, never()).generateToken(any());
 		}
@@ -108,14 +105,13 @@ class AuthServiceTest {
 			LoginRequest loginRequest = new LoginRequest("test@email.com", "Test123");
 			testUser = TestDataFactory.newUser();
 			testUser.setIsArchived(true);
-
-			when(userRepo.findByEmail(loginRequest.email()))
-					.thenReturn(Optional.of(testUser));
+			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+					new UserDetailsImpl(testUser), loginRequest.password());
+			when(authManager.authenticate(any(Authentication.class))).thenReturn(authToken);
 
 			assertThrows(UnauthorizedAccessException.class, () -> authService.login(loginRequest));
 
-			verify(userRepo, times(1)).findByEmail(loginRequest.email());
-			verify(authManager, never()).authenticate(any(Authentication.class));
+			verify(authManager, times(1)).authenticate(any(Authentication.class));
 			verify(jwtService, never()).generateToken(any());
 		}
 
@@ -123,14 +119,14 @@ class AuthServiceTest {
 		@DisplayName("Should throw exception when user not found")
 		void login_WithNonexistentUser_ShouldThrowException() {
 			LoginRequest loginRequest = new LoginRequest("test@email.com", "Test123");
-			when(userRepo.findByEmail(loginRequest.email()))
-					.thenReturn(Optional.empty());
 
-			assertThrows(EntityNotFoundException.class, () ->
+			when(authManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+					.thenThrow(new BadCredentialsException(ExceptionConstant.INVALID_CREDENTIALS));
+
+			assertThrows(BadCredentialsException.class, () ->
 					authService.login(loginRequest));
 
-			verify(userRepo).findByEmail(loginRequest.email());
-			verify(authManager, never()).authenticate(any());
+			verify(authManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
 			verify(jwtService, never()).generateToken(any());
 		}
 	}

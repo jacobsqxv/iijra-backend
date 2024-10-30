@@ -8,6 +8,7 @@ import dev.aries.iijra.module.token.TokenService;
 import dev.aries.iijra.module.user.User;
 import dev.aries.iijra.module.user.UserRepository;
 import dev.aries.iijra.security.JwtService;
+import dev.aries.iijra.security.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +33,13 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 
 	public LoginResponse login(LoginRequest request) {
-		User user = checkUser(request.email());
-		checkIsInactiveOrIsDeleted(user);
-		Authentication auth = authManager
-				.authenticate(new UsernamePasswordAuthenticationToken(
+		Authentication auth = authManager.authenticate(
+				new UsernamePasswordAuthenticationToken(
 						request.email(), request.password()
 				));
+
+		User user = ((UserDetailsImpl) auth.getPrincipal()).user();
+		checkIsInactiveOrIsDeleted(user);
 		String token = jwtService.generateToken(auth);
 		return LoginResponse.newResponse(user, token);
 	}
