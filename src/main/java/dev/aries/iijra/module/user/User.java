@@ -5,8 +5,6 @@ import java.util.Objects;
 
 import dev.aries.iijra.enums.Role;
 import dev.aries.iijra.enums.Status;
-import dev.aries.iijra.module.admin.Admin;
-import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.utility.Auditing;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -17,7 +15,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,14 +46,6 @@ public class User {
 	@Column(nullable = false)
 	@ToString.Exclude
 	private String password;
-
-	@OneToOne(mappedBy = "user")
-	@ToString.Exclude
-	private Staff staff;
-
-	@OneToOne(mappedBy = "user")
-	@ToString.Exclude
-	private Admin admin;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
