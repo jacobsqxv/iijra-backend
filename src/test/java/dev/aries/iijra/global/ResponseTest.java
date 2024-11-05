@@ -20,7 +20,7 @@ class ResponseTest {
 		ResponseEntity<Object> response = Response.success(HttpStatus.OK, data);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(new Response(HttpStatus.OK.value(), data), response.getBody());
+		assertEquals(new Response(data), response.getBody());
 	}
 
 	@Test
@@ -31,18 +31,16 @@ class ResponseTest {
 		ResponseEntity<Object> response = Response.error(HttpStatus.BAD_REQUEST, error, details);
 
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertEquals(new Response.ErrorResponse(HttpStatus.BAD_REQUEST.value(), error, details), response.getBody());
+		assertEquals(new Response.ErrorResponse(error, details), response.getBody());
 	}
 
 	@Test
 	@DisplayName("Should return correct fields in response object")
 	void errorResponse_shouldHaveCorrectFields() {
-		int code = 400;
 		String error = "Error message";
 		Set<String> details = new HashSet<>(Set.of("Detail 1", "Detail 2"));
-		Response.ErrorResponse errorResponse = new Response.ErrorResponse(code, error, details);
+		Response.ErrorResponse errorResponse = new Response.ErrorResponse(error, details);
 
-		assertEquals(code, errorResponse.code());
 		assertEquals(error, errorResponse.error());
 		assertEquals(details, errorResponse.details());
 	}

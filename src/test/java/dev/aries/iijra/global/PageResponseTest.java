@@ -47,8 +47,7 @@ class PageResponseTest {
 		ResponseEntity<PageResponse<String>> response = PageResponse.of(pageData, HttpStatus.OK);
 
 		// Assert
-		assertEquals(HttpStatus.OK.value(), Objects.requireNonNull(response.getBody()).code());
-		assertEquals(data, response.getBody().data());
+		assertEquals(data, Objects.requireNonNull(response.getBody()).data());
 		assertEquals(page, response.getBody().metadata().page());
 		assertEquals(size, response.getBody().metadata().size());
 		assertEquals(totalElements, response.getBody().metadata().totalElements());
