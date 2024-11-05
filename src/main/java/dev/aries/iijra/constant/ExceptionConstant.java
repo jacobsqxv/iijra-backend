@@ -4,6 +4,7 @@ public final class ExceptionConstant {
 
 	public static final String DEPT_NAME_ALREADY_EXISTS = "Department already exists with name: ";
 	public static final String USER_EMAIL_ALREADY_EXISTS = "User already exists with email: ";
+	public static final String CATEGORY_NAME_ALREADY_EXISTS = "Category already exists with name: ";
 
 	public static final String INVALID_CURRENT_PASSWORD = "Current password is invalid";
 	public static final String INVALID_REQUEST = "There was a problem with the request";
@@ -25,8 +26,10 @@ public final class ExceptionConstant {
 
 	public static final String USER_ALREADY_ARCHIVED = "Archiving failed for user with id: ";
 	public static final String DEPT_ALREADY_ARCHIVED = "Archiving failed for department with id: ";
+	public static final String CATEGORY_ALREADY_ARCHIVED = "Archiving failed for category with id: ";
 	public static final String USER_NOT_ARCHIVED = "Restore failed for user with id: ";
 	public static final String DEPT_NOT_ARCHIVED = "Restore failed for department with id: ";
+	public static final String CATEGORY_NOT_ARCHIVED = "Restore failed for category with id: ";
 
 	public static final String FILE_UPLOAD_FAILURE = "There was a problem uploading the file";
 	public static final String FILE_DOWNLOAD_FAILURE = "There was a problem downloading the file";

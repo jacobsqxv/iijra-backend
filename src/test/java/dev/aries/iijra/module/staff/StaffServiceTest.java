@@ -97,7 +97,7 @@ class StaffServiceTest {
 		@DisplayName("Should successfully set HOD if valid request and department has no HOD")
 		void addStaff_NoHODForDepartment_SuccessTest() {
 			testRequest = new StaffRequest(TEST_USER_EMAIL, "John Doe", TEST_DEPT_ID, true);
-			doReturn(testUser).when(userService).createUser(TEST_USER_EMAIL, Role.STAFF);
+			doReturn(testUser).when(userService).createUser(TEST_USER_EMAIL, Role.HOD);
 			when(departmentService.getDepartmentById(TEST_DEPT_ID)).thenReturn(testDept);
 			when(staffRepo.findByDepartmentIdAndIsHodTrue(TEST_DEPT_ID)).thenReturn(Optional.empty());
 
@@ -120,7 +120,6 @@ class StaffServiceTest {
 			when(staffRepo.findByDepartmentIdAndIsHodTrue(TEST_DEPT_ID)).thenReturn(Optional.of(existingHod));
 
 			when(departmentService.getDepartmentById(1L)).thenReturn(testDept);
-			doReturn(testUser).when(userService).createUser(TEST_USER_EMAIL, Role.STAFF);
 
 			assertThrows(IllegalStateException.class, () -> staffService.addNewStaff(testRequest));
 

@@ -25,7 +25,6 @@ public class JwtAuthConfig {
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
 			Response.ErrorResponse errorResponse = new Response.ErrorResponse(
-					status.value(),
 					status.getReasonPhrase(),
 					Collections.singleton(getDetailedMessage(authException)));
 
@@ -41,7 +40,6 @@ public class JwtAuthConfig {
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
 			Response.ErrorResponse errorResponse = new Response.ErrorResponse(
-					status.value(),
 					status.getReasonPhrase(),
 					Collections.singleton(accessDeniedException.getMessage()));
 

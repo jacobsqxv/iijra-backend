@@ -34,9 +34,7 @@ public class UserService {
 	}
 
 	private String generateTemporaryPassword() {
-		String password = UUID.randomUUID().toString();
-		log.info("Generated temporary password: {}", password);
-		return password;
+		return UUID.randomUUID().toString();
 	}
 
 	private void validateUserEmail(@NonNull String email) {

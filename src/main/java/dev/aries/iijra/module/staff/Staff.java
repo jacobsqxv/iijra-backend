@@ -20,7 +20,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.proxy.HibernateProxy;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -62,12 +61,10 @@ public class Staff {
 	@Column(nullable = false)
 	private Auditing auditing = new Auditing();
 
-	public Staff(String id, String fullName, User user, Department department) {
-		this.id = id;
+	public Staff(String profileImage, String fullName, Department department) {
 		this.fullName = fullName;
-		this.user = user;
 		this.department = department;
-		this.isHod = false;
+		this.profileImage = profileImage;
 	}
 
 	@Override
@@ -75,25 +72,17 @@ public class Staff {
 		if (this == o) {
 			return true;
 		}
-		if (o == null) {
+		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ?
-				proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-		Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ?
-				proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-		if (!thisEffectiveClass.equals(oEffectiveClass)) {
-			return false;
-		}
-		if (!(o instanceof Staff that)) {
-			return false;
-		}
-		return getId() != null && Objects.equals(getId(), that.getId());
+		Staff that = (Staff) o;
+		return Objects.equals(getId(), that.getId()) &&
+				Objects.equals(getDepartment(), that.getDepartment()) &&
+				Objects.equals(getUser(), that.getUser());
 	}
 
 	@Override
 	public final int hashCode() {
-		return this instanceof HibernateProxy proxy ?
-				proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+		return Objects.hash(getId(), getDepartment(), getUser());
 	}
 }
