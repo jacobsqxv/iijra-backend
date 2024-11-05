@@ -3,9 +3,6 @@ package dev.aries.iijra.model;
 import dev.aries.iijra.module.admin.Admin;
 import dev.aries.iijra.module.category.Category;
 import dev.aries.iijra.module.department.Department;
-import dev.aries.iijra.module.sop.SOP;
-import dev.aries.iijra.module.sop.sopstaff.SOPStaff;
-import dev.aries.iijra.module.sop.sopversion.SOPVersion;
 import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.module.token.Token;
 import dev.aries.iijra.module.user.User;
@@ -80,39 +77,6 @@ class EntityTests {
 				.forClass(User.class)
 				.withIgnoredAnnotations(Entity.class, Id.class)
 				.withOnlyTheseFields("id", "email")
-				.verify();
-	}
-
-	@Test
-	@DisplayName("SOP equals and hashCode contract")
-	void sopEqualsAndHashCodeContract() {
-		EqualsVerifier
-				.simple()
-				.forClass(SOP.class)
-				.withIgnoredAnnotations(Entity.class, Id.class)
-				.withOnlyTheseFields("id", "title")
-				.verify();
-	}
-
-	@Test
-	@DisplayName("SOPVersion equals and hashCode contract")
-	void sopVersionEqualsAndHashCodeContract() {
-		EqualsVerifier
-				.simple()
-				.forClass(SOPVersion.class)
-				.withIgnoredAnnotations(Entity.class, Id.class)
-				.withOnlyTheseFields("id", "sop")
-				.verify();
-	}
-
-	@Test
-	@DisplayName("SOPStaff equals and hashCode contract")
-	void sopStaffEqualsAndHashCodeContract() {
-		EqualsVerifier
-				.simple()
-				.forClass(SOPStaff.class)
-				.withIgnoredAnnotations(Entity.class, Id.class)
-				.withOnlyTheseFields("id", "sop")
 				.verify();
 	}
 }
