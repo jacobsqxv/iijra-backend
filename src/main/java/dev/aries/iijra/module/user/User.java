@@ -22,7 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.proxy.HibernateProxy;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -84,29 +83,19 @@ public class User {
 	}
 
 	@Override
-	public final boolean equals(Object o) {
+	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
 		}
-		if (o == null) {
+		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ?
-				proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-		Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ?
-				proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-		if (!thisEffectiveClass.equals(oEffectiveClass)) {
-			return false;
-		}
-		if (!(o instanceof User that)) {
-			return false;
-		}
-		return getId() != null && Objects.equals(getId(), that.getId());
+		User that = (User) o;
+		return Objects.equals(getId(), that.getId()) && Objects.equals(getEmail(), that.getEmail());
 	}
 
 	@Override
-	public final int hashCode() {
-		return this instanceof HibernateProxy proxy ?
-				proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+	public int hashCode() {
+		return Objects.hash(getId(), getEmail());
 	}
 }

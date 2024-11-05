@@ -14,12 +14,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.proxy.HibernateProxy;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -28,7 +26,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Builder
 @ToString
 @EntityListeners(AuditingEntityListener.class)
 public class Admin {
@@ -60,25 +57,17 @@ public class Admin {
 		if (this == o) {
 			return true;
 		}
-		if (o == null) {
+		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ?
-				proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-		Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ?
-				proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-		if (!thisEffectiveClass.equals(oEffectiveClass)) {
-			return false;
-		}
-		if (!(o instanceof Admin that)) {
-			return false;
-		}
-		return getId() != null && Objects.equals(getId(), that.getId());
+		Admin that = (Admin) o;
+		return Objects.equals(getId(), that.getId()) &&
+				Objects.equals(getFullName(), that.getFullName()) &&
+				Objects.equals(getUser(), that.getUser());
 	}
 
 	@Override
 	public final int hashCode() {
-		return this instanceof HibernateProxy proxy ?
-				proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+		return Objects.hash(getId(), getFullName(), getUser());
 	}
 }
