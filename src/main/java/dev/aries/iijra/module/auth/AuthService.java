@@ -63,8 +63,7 @@ public class AuthService {
 
 	@Transactional
 	public String resetPassword(@NonNull String token, ResetPassword request) {
-		User user = checkUser(request.email());
-		tokenService.validateToken(user, token);
+		User user = tokenService.validateToken(request.email(), token);
 		user.setPassword(passwordEncoder.encode(request.password()));
 		userRepo.save(user);
 		tokenService.deleteUsedToken(user, token);
