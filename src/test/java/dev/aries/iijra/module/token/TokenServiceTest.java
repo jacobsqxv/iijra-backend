@@ -42,6 +42,7 @@ class TokenServiceTest {
 	@BeforeEach
 	void setUp() {
 		testUser = new User();
+		testUser.setEmail("test@email.com");
 	}
 
 	@Nested
@@ -105,47 +106,50 @@ class TokenServiceTest {
 		void validateToken_WithValidTokenAndNotExpired_ShouldNotThrowException() {
 			LocalDateTime futureTime = LocalDateTime.now().plusMinutes(5);
 			Token validToken = new Token(testUser, TEST_TOKEN_VALUE, TokenType.PASSWORD_RESET, futureTime);
-			when(tokenRepo.findByUserAndValue(testUser, TEST_TOKEN_VALUE))
+			when(tokenRepo.findByUser_EmailAndValue(testUser.getEmail(), TEST_TOKEN_VALUE))
 					.thenReturn(Optional.of(validToken));
 
-			assertDoesNotThrow(() -> tokenService.validateToken(testUser, TEST_TOKEN_VALUE));
+			assertDoesNotThrow(() -> tokenService.validateToken(testUser.getEmail(), TEST_TOKEN_VALUE));
 		}
 
 		@Test
 		@DisplayName("Should throw exception with expired token")
 		void validateToken_WithExpiredToken_ShouldThrowInvalidTokenException() {
+			String email = testUser.getEmail();
 			LocalDateTime pastTime = LocalDateTime.now().minusMinutes(5);
 			Token expiredToken = new Token(testUser, TEST_TOKEN_VALUE, TokenType.PASSWORD_RESET, pastTime);
 
-			when(tokenRepo.findByUserAndValue(testUser, TEST_TOKEN_VALUE)).thenReturn(Optional.of(expiredToken));
+			when(tokenRepo.findByUser_EmailAndValue(testUser.getEmail(), TEST_TOKEN_VALUE)).thenReturn(Optional.of(expiredToken));
 
 			assertThrows(InvalidTokenException.class,
-					() -> tokenService.validateToken(testUser, TEST_TOKEN_VALUE));
+					() -> tokenService.validateToken(email, TEST_TOKEN_VALUE));
 		}
 
 		@Test
 		@DisplayName("Should throw exception with non-existing token")
 		void validateToken_WithNonexistentToken_ShouldThrowEntityNotFoundException() {
-			when(tokenRepo.findByUserAndValue(testUser, TEST_TOKEN_VALUE))
+			String email = testUser.getEmail();
+			when(tokenRepo.findByUser_EmailAndValue(email, TEST_TOKEN_VALUE))
 					.thenReturn(Optional.empty());
 
 			EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-					() -> tokenService.validateToken(testUser, TEST_TOKEN_VALUE));
+					() -> tokenService.validateToken(email, TEST_TOKEN_VALUE));
 
-			assertTrue(exception.getMessage().contains(ExceptionConstant.TOKEN_VALUE_DOESNT_EXIST));
-			assertTrue(exception.getMessage().contains(TEST_TOKEN_VALUE));
+			assertTrue(exception.getMessage().contains(ExceptionConstant.TOKEN_USER_DOESNT_EXIST));
+			assertTrue(exception.getMessage().contains(email));
 		}
 
 		@Test
 		@DisplayName("Should throw exception with token expiring at time of validation")
 		void validateToken_WithBoundaryExpirationTime_ShouldBehaveCorrectly() {
 			LocalDateTime exactlyNow = LocalDateTime.now();
+			String email = testUser.getEmail();
 			Token tokenExactlyNow = new Token(testUser, TEST_TOKEN_VALUE, TokenType.PASSWORD_RESET, exactlyNow);
-			when(tokenRepo.findByUserAndValue(testUser, TEST_TOKEN_VALUE))
+			when(tokenRepo.findByUser_EmailAndValue(testUser.getEmail(), TEST_TOKEN_VALUE))
 					.thenReturn(Optional.of(tokenExactlyNow));
 
 			assertThrows(InvalidTokenException.class,
-					() -> tokenService.validateToken(testUser, TEST_TOKEN_VALUE),
+					() -> tokenService.validateToken(email, TEST_TOKEN_VALUE),
 					"Token expiring exactly now should be considered expired");
 		}
 	}

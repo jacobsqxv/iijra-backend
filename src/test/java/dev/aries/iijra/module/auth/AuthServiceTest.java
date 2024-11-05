@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -178,19 +178,17 @@ class AuthServiceTest {
 			ResetPassword request = new ResetPassword("test@email.com", "newPassword123");
 			testUser = TestDataFactory.newUser();
 
-			when(userRepo.findByEmail(request.email()))
-					.thenReturn(Optional.of(testUser));
 			when(passwordEncoder.encode(request.password()))
 					.thenReturn("encodedPassword");
-			doNothing().when(tokenService).validateToken(testUser, token);
+			doReturn(testUser).when(tokenService).validateToken(request.email(), token);
 
 			String response = authService.resetPassword(token, request);
 
 			assertEquals("Password reset successfully! Proceed to login", response);
-			verify(userRepo).findByEmail(request.email());
+
 			verify(userRepo).save(testUser);
 			verify(passwordEncoder).encode(request.password());
-			verify(tokenService).validateToken(testUser, token);
+			verify(tokenService).validateToken(request.email(), token);
 			verify(tokenService).deleteUsedToken(testUser, token);
 		}
 
@@ -201,15 +199,12 @@ class AuthServiceTest {
 			ResetPassword request = new ResetPassword("test@email.com", "newPassword123");
 			testUser = TestDataFactory.newUser();
 
-			when(userRepo.findByEmail(request.email()))
-					.thenReturn(Optional.of(testUser));
 			doThrow(new InvalidTokenException())
-					.when(tokenService).validateToken(testUser, token);
+					.when(tokenService).validateToken(request.email(), token);
 
 			assertThrows(InvalidTokenException.class, () ->
 					authService.resetPassword(token, request));
 
-			verify(userRepo).findByEmail(request.email());
 			verify(userRepo, never()).save(any());
 			verify(passwordEncoder, never()).encode(any());
 			verify(tokenService, never()).deleteUsedToken(any(), any());
@@ -221,16 +216,15 @@ class AuthServiceTest {
 			String token = "valid-token";
 			ResetPassword request = new ResetPassword("nonexistent@email.com", "newPassword123");
 
-			when(userRepo.findByEmail(request.email()))
-					.thenReturn(Optional.empty());
+			doThrow(new EntityNotFoundException())
+					.when(tokenService).validateToken(request.email(), token);
 
 			assertThrows(EntityNotFoundException.class, () ->
 					authService.resetPassword(token, request));
 
-			verify(userRepo).findByEmail(request.email());
 			verify(userRepo, never()).save(any());
 			verify(passwordEncoder, never()).encode(any());
-			verify(tokenService, never()).validateToken(any(), any());
+			verify(tokenService, times(1)).validateToken(request.email(), token);
 			verify(tokenService, never()).deleteUsedToken(any(), any());
 		}
 	}
