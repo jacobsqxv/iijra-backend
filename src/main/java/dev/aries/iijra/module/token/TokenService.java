@@ -46,16 +46,17 @@ public class TokenService {
 		return token.toString();
 	}
 
-	public void validateToken(User user, String value) {
-		Token token = getTokenByUserAndValue(user, value);
+	public User validateToken(String email, String value) {
+		Token token = getTokenByUserAndValue(email, value);
 		if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
 			throw new InvalidTokenException();
 		}
+		return token.getUser();
 	}
 
-	private Token getTokenByUserAndValue(User user, String value) {
-		return tokenRepo.findByUserAndValue(user, value)
-				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.TOKEN_VALUE_DOESNT_EXIST + value));
+	private Token getTokenByUserAndValue(String email, String value) {
+		return tokenRepo.findByUser_EmailAndValue(email, value)
+				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.TOKEN_USER_DOESNT_EXIST + email));
 	}
 
 	public void deleteUsedToken(User user, String value) {

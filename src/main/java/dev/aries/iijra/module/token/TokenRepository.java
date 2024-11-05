@@ -13,8 +13,8 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
 	@EntityGraph(attributePaths = {"user"}, type = EntityGraph.EntityGraphType.LOAD)
 	void deleteAllByUserAndType(User user, TokenType type);
 
-	@EntityGraph(attributePaths = {"user"}, type = EntityGraph.EntityGraphType.LOAD)
-	Optional<Token> findByUserAndValue(User user, String value);
+	@EntityGraph(attributePaths = {"user"}, type = EntityGraph.EntityGraphType.FETCH)
+	Optional<Token> findByUser_EmailAndValue(String email, String value);
 
 	@EntityGraph(attributePaths = {"user"}, type = EntityGraph.EntityGraphType.LOAD)
 	void deleteByUserAndValue(User user, String value);
