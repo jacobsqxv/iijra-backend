@@ -5,6 +5,7 @@ import dev.aries.iijra.enums.Status;
 import dev.aries.iijra.module.department.Department;
 import dev.aries.iijra.module.staff.Staff;
 import dev.aries.iijra.module.user.User;
+import dev.aries.iijra.utility.Auditing;
 
 public class TestDataFactory {
 
@@ -19,11 +20,14 @@ public class TestDataFactory {
 	}
 
 	public static Staff newStaff() {
-		return new Staff(
-				"ST0001",
-				"John Doe",
-				newUser(),
-				newDepartment());
+		return Staff.builder()
+				.id("ST0001")
+				.fullName("John Doe")
+				.user(newUser())
+				.department(newDepartment())
+				.auditing(new Auditing())
+				.isHod(false)
+				.build();
 	}
 
 	public static Department newDepartment() {

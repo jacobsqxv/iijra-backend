@@ -47,41 +47,57 @@ public class StaffService {
 		Department department = departmentService.getDepartmentById(request.departmentId());
 
 		Staff newStaff = createStaff(request, department);
-		newStaff.setProfileImage(defaultProfileImage);
 
-		if (Boolean.TRUE.equals(request.isHod())) {
-			assignDepartmentPosition(newStaff);
-		}
+		assignDepartmentPosition(newStaff, request);
+
+		String staffId = formatStaffId(newStaff.getUser().getId());
+		newStaff.setId(staffId);
+
 		staffRepo.save(newStaff);
-		return StaffResponse.fullResponse(newStaff);
+
+		StaffResponse response = StaffResponse.fullResponse(newStaff);
+		log.info("Generated staff - Email: {}, Department: {}, Position: {}",
+				response.email(),
+				response.department(),
+				response.position()
+		);
+		return response;
 	}
 
-
 	private Staff createStaff(StaffRequest request, Department department) {
-		User newUser = userService.createUser(request.email(), Role.STAFF);
-		String staffId = formatStaffId(newUser.getId());
 		return new Staff(
-				staffId,
+				defaultProfileImage,
 				request.fullName(),
-				newUser,
 				department);
 	}
 
 	/**
 	 * Check and assign a HOD position in a department to a staff member.
 	 *
-	 * @param staff the staff member to be assigned the position
+	 * @param staff   the staff member to be assigned the position
+	 * @param request the request containing the staff information
 	 */
-	private void assignDepartmentPosition(Staff staff) {
+	private void assignDepartmentPosition(Staff staff, StaffRequest request) {
+		if (Boolean.FALSE.equals(request.isHod())) {
+			staff.setIsHod(false);
+			createUserAndAssignToStaff(staff, request.email(), Role.STAFF);
+			return;
+		}
+
 		Staff departmentHod = getDepartmentHod(staff.getDepartment().getId());
+
 		if (departmentHod != null) {
 			throw new IllegalStateException(String.format("Department already has HOD: %s.",
 					departmentHod.getFullName())
 			);
-		} else {
-			staff.setIsHod(true);
-			staff.getUser().setRole(Role.HOD);
 		}
+		staff.setIsHod(true);
+		createUserAndAssignToStaff(staff, request.email(), Role.HOD);
+	}
+
+	private void createUserAndAssignToStaff(Staff staff, String email, Role role) {
+		User newUser = userService.createUser(email, role);
+		staff.setUser(newUser);
 	}
 
 	@Transactional(readOnly = true)
@@ -107,7 +123,7 @@ public class StaffService {
 				.orElse(null);
 	}
 
-	private Staff getStaff(Long id) {
+	public Staff getStaff(Long id) {
 		String staffId = formatStaffId(id);
 		return staffRepo.findById(staffId)
 				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.STAFF_ID_DOESNT_EXIST + id));
@@ -132,5 +148,10 @@ public class StaffService {
 			s3Service.deleteFile(oldImage);
 			log.info("Old profile image has been removed");
 		}
+	}
+
+	public Staff getStaffByUserEmail(String email) {
+		return staffRepo.findByUser_Email(email)
+				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.USER_EMAIL_DOESNT_EXIST + email));
 	}
 }

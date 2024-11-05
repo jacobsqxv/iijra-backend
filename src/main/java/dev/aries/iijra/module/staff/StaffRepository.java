@@ -22,4 +22,7 @@ public interface StaffRepository extends JpaRepository<Staff, String>, JpaSpecif
 
 	@EntityGraph(attributePaths = {"department", "user"}, type = EntityGraph.EntityGraphType.LOAD)
 	List<Staff> findAllByDepartmentId(Long departmentId);
+
+	@EntityGraph(attributePaths = {"department", "user"}, type = EntityGraph.EntityGraphType.LOAD)
+	Optional<Staff> findByUser_Email(String email);
 }
