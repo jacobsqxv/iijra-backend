@@ -46,7 +46,7 @@ public final class StaffSpecification {
 			// Handle status
 			if (request.status() != null && !request.status().trim().isEmpty()) {
 				predicates.add(cb.equal(
-						root.get("status"),
+						root.get("user").get("status"),
 						Status.valueOf(request.status().toUpperCase())
 				));
 			}
