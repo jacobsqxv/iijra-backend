@@ -78,7 +78,6 @@ class AuthServiceTest {
 
 			assertNotNull(response);
 			assertNotNull(response.token());
-			assertEquals(loginRequest.email(), response.email());
 
 			verify(authManager, times(1)).authenticate(any(Authentication.class));
 			verify(jwtService, times(1)).generateToken(auth);

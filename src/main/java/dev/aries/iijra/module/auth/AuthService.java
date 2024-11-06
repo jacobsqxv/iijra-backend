@@ -37,11 +37,11 @@ public class AuthService {
 				new UsernamePasswordAuthenticationToken(
 						request.email(), request.password()
 				));
-
+		log.info("Principal class: {}", auth.getPrincipal().getClass());
 		User user = ((UserDetailsImpl) auth.getPrincipal()).user();
 		checkIsInactiveOrIsDeleted(user);
 		String token = jwtService.generateToken(auth);
-		return LoginResponse.newResponse(user, token);
+		return new LoginResponse(token);
 	}
 
 	private void checkIsInactiveOrIsDeleted(User user) {
