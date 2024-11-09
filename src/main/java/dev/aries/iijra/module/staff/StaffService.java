@@ -150,8 +150,8 @@ public class StaffService {
 		}
 	}
 
-	public Staff getStaffByUserEmail(String email) {
-		return staffRepo.findByUser_Email(email)
-				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.USER_EMAIL_DOESNT_EXIST + email));
+	public Staff getStaffByUserId(Long userId) {
+		return staffRepo.findByUser_Id(userId)
+				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.USER_ID_DOESNT_EXIST + userId));
 	}
 }
