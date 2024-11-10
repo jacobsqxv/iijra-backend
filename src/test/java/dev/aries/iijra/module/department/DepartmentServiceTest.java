@@ -126,11 +126,11 @@ class DepartmentServiceTest {
 			List<Staff> staff = List.of(TestDataFactory.newStaff());
 			deptStaffResponse = new DepartmentResponse.DepartmentStaff(hod, staff);
 			when(deptStaff.getDepartmentStaff(any(Long.class))).thenReturn(deptStaffResponse);
-			when(departmentRepo.findByIsArchivedFalse()).thenReturn(testDepartments);
+			when(departmentRepo.findByArchivedFalse()).thenReturn(testDepartments);
 
 			List<DepartmentResponse> response = departmentService.getAllDepartments();
 
-			verify(departmentRepo).findByIsArchivedFalse();
+			verify(departmentRepo).findByArchivedFalse();
 			assertEquals(testDepartments.size(), response.size());
 		}
 	}
@@ -146,7 +146,7 @@ class DepartmentServiceTest {
 		@Test
 		@DisplayName("Should successfully archive department when not already archived")
 		void archiveDepartment_WithValidDeptId_SuccessTest() {
-			testDepartment.setIsArchived(false);
+			testDepartment.setArchived(false);
 
 			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
 
@@ -159,7 +159,7 @@ class DepartmentServiceTest {
 		@Test
 		@DisplayName("Should throw exception when department is already archived")
 		void archiveDepartment_WithAlreadyArchivedDept_ShouldThrowException() {
-			testDepartment.setIsArchived(true);
+			testDepartment.setArchived(true);
 
 			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
 
@@ -183,7 +183,7 @@ class DepartmentServiceTest {
 		@Test
 		@DisplayName("Should successfully restore archived department when already archived")
 		void restoreArchivedDepartment_WithValidDeptId_SuccessTest() {
-			testDepartment.setIsArchived(true);
+			testDepartment.setArchived(true);
 
 			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
 
@@ -196,7 +196,7 @@ class DepartmentServiceTest {
 		@Test
 		@DisplayName("Should throw exception when department is not archived")
 		void restoreArchivedDepartment_WithAlreadyArchivedDept_ShouldThrowException() {
-			testDepartment.setIsArchived(false);
+			testDepartment.setArchived(false);
 
 			when(departmentRepo.findById(TEST_DEPT_ID)).thenReturn(Optional.of(testDepartment));
 

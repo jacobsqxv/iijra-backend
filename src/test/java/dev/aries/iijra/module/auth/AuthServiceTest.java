@@ -103,7 +103,7 @@ class AuthServiceTest {
 		void login_InactiveUser_ShouldThrowException() {
 			LoginRequest loginRequest = new LoginRequest("test@email.com", "Test123");
 			testUser = TestDataFactory.newUser();
-			testUser.setIsArchived(true);
+			testUser.setArchived(true);
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 					new UserDetailsImpl(testUser), loginRequest.password());
 			when(authManager.authenticate(any(Authentication.class))).thenReturn(authToken);

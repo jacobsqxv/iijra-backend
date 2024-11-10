@@ -39,22 +39,22 @@ public class Department {
 	private Auditing auditing = new Auditing();
 
 	@Column(nullable = false)
-	private Boolean isArchived;
+	private Boolean archived;
 
 	private LocalDateTime archivedAt;
 
 	public Department(String name) {
 		this.name = name;
-		this.isArchived = false;
+		this.archived = false;
 	}
 
 	public void archive() {
-		this.isArchived = true;
+		this.archived = true;
 		this.archivedAt = LocalDateTime.now();
 	}
 
 	public void restore() {
-		this.isArchived = false;
+		this.archived = false;
 		this.archivedAt = null;
 	}
 

@@ -41,7 +41,7 @@ class DepartmentStaffTests {
 	@DisplayName("Should return staff list with HOD")
 	void returnsStaffListWithHod() {
 		Staff testHod = TestDataFactory.newStaff();
-		testHod.setIsHod(true);
+		testHod.setHod(true);
 		List<Staff> staffList = new ArrayList<>(List.of(testHod, testStaff1, testStaff2));
 
 		when(staffRepo.findAllByDepartmentId(1L)).thenReturn(staffList);

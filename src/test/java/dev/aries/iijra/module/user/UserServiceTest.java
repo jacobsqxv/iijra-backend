@@ -130,7 +130,7 @@ class UserServiceTest {
 		@Test
 		@DisplayName("Should successfully archive user when not already archived")
 		void archiveUser_WithValidUserId_SuccessTest() {
-			testUser.setIsArchived(false);
+			testUser.setArchived(false);
 
 			when(userRepo.findById(TEST_USER_ID)).thenReturn(Optional.of(testUser));
 
@@ -143,7 +143,7 @@ class UserServiceTest {
 		@Test
 		@DisplayName("Should throw exception when user is already archived")
 		void archiveUser_WithAlreadyArchivedUser_ShouldThrowException() {
-			testUser.setIsArchived(true);
+			testUser.setArchived(true);
 
 			when(userRepo.findById(TEST_USER_ID)).thenReturn(Optional.of(testUser));
 
@@ -165,7 +165,7 @@ class UserServiceTest {
 		@Test
 		@DisplayName("Should successfully restore archived user when already archived")
 		void archiveUser_WithValidUserId_SuccessTest() {
-			testUser.setIsArchived(true);
+			testUser.setArchived(true);
 
 			when(userRepo.findById(TEST_USER_ID)).thenReturn(Optional.of(testUser));
 
@@ -178,7 +178,7 @@ class UserServiceTest {
 		@Test
 		@DisplayName("Should throw exception when user is not archived")
 		void archiveUser_WithAlreadyArchivedUser_ShouldThrowException() {
-			testUser.setIsArchived(false);
+			testUser.setArchived(false);
 
 			when(userRepo.findById(TEST_USER_ID)).thenReturn(Optional.of(testUser));
 

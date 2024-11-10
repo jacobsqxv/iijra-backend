@@ -45,7 +45,7 @@ public class AuthService {
 	}
 
 	private void checkIsInactiveOrIsDeleted(User user) {
-		if (Boolean.TRUE.equals(user.getIsArchived()) || Status.INACTIVE.equals(user.getStatus())) {
+		if (Boolean.TRUE.equals(user.getArchived()) || Status.INACTIVE.equals(user.getStatus())) {
 			throw new UnauthorizedAccessException(ExceptionConstant.ACCOUNT_DEACTIVATED);
 		}
 	}

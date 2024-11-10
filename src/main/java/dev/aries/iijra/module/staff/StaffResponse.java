@@ -45,7 +45,7 @@ public record StaffResponse(
 	}
 
 	private static String returnPosition(Staff staff) {
-		if (Boolean.TRUE.equals(staff.getIsHod())) {
+		if (Boolean.TRUE.equals(staff.getHod())) {
 			return "Head of Department";
 		} else {
 			return "Staff";

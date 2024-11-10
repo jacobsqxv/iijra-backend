@@ -61,7 +61,7 @@ public class Staff {
 	private Department department;
 
 	@Column(nullable = false)
-	private Boolean isHod;
+	private Boolean hod;
 
 	@Embedded
 	@Column(nullable = false)

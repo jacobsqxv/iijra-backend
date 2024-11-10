@@ -66,7 +66,7 @@ public class UserService {
 	@Transactional
 	public String archiveUser(Long id) {
 		User user = getUserById(id);
-		if (Boolean.TRUE.equals(user.getIsArchived())) {
+		if (Boolean.TRUE.equals(user.getArchived())) {
 			throw new IllegalStateException(ExceptionConstant.USER_ALREADY_ARCHIVED + id);
 		}
 		user.archive();
@@ -77,7 +77,7 @@ public class UserService {
 	@Transactional
 	public String restoreArchivedUser(Long id) {
 		User user = getUserById(id);
-		if (Boolean.FALSE.equals(user.getIsArchived())) {
+		if (Boolean.FALSE.equals(user.getArchived())) {
 			throw new IllegalStateException(ExceptionConstant.USER_NOT_ARCHIVED + id);
 		}
 		user.restore();

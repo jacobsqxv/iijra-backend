@@ -52,7 +52,7 @@ public class CategoryService {
 
 	public String archiveCategory(Long id) {
 		Category category = getCategory(id);
-		if (Boolean.TRUE.equals(category.getIsArchived())) {
+		if (Boolean.TRUE.equals(category.getArchived())) {
 			throw new IllegalStateException(ExceptionConstant.CATEGORY_ALREADY_ARCHIVED + id);
 		}
 		category.archive();
@@ -62,7 +62,7 @@ public class CategoryService {
 
 	public String restoreArchivedCategory(Long id) {
 		Category category = getCategory(id);
-		if (Boolean.FALSE.equals(category.getIsArchived())) {
+		if (Boolean.FALSE.equals(category.getArchived())) {
 			throw new IllegalStateException(ExceptionConstant.CATEGORY_NOT_ARCHIVED + id);
 		}
 		category.restore();

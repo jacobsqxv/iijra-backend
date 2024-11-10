@@ -20,7 +20,7 @@ public interface StaffRepository extends JpaRepository<Staff, String>, JpaSpecif
 	}
 
 	@EntityGraph(value = "Staff.withDetails", type = EntityGraph.EntityGraphType.LOAD)
-	Optional<Staff> findByDepartmentIdAndIsHodTrue(Long departmentId);
+	Optional<Staff> findByDepartmentIdAndHodTrue(Long departmentId);
 
 	@EntityGraph(value = "Staff.withDetails", type = EntityGraph.EntityGraphType.LOAD)
 	List<Staff> findAllByDepartmentId(Long departmentId);
