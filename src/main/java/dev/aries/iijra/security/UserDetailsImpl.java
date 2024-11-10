@@ -29,7 +29,7 @@ public record UserDetailsImpl(User user) implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return !user.getIsArchived() && Status.ACTIVE.equals(user.getStatus());
+		return !user.getArchived() && Status.ACTIVE.equals(user.getStatus());
 	}
 
 

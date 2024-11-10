@@ -79,7 +79,7 @@ public class StaffService {
 	 */
 	private void assignDepartmentPosition(Staff staff, StaffRequest request) {
 		if (Boolean.FALSE.equals(request.isHod())) {
-			staff.setIsHod(false);
+			staff.setHod(false);
 			createUserAndAssignToStaff(staff, request.email(), Role.STAFF);
 			return;
 		}
@@ -91,7 +91,7 @@ public class StaffService {
 					departmentHod.getFullName())
 			);
 		}
-		staff.setIsHod(true);
+		staff.setHod(true);
 		createUserAndAssignToStaff(staff, request.email(), Role.HOD);
 	}
 
@@ -119,7 +119,7 @@ public class StaffService {
 	}
 
 	private Staff getDepartmentHod(Long departmentId) {
-		return staffRepo.findByDepartmentIdAndIsHodTrue(departmentId)
+		return staffRepo.findByDepartmentIdAndHodTrue(departmentId)
 				.orElse(null);
 	}
 
@@ -150,8 +150,8 @@ public class StaffService {
 		}
 	}
 
-	public Staff getStaffByUserEmail(String email) {
-		return staffRepo.findByUser_Email(email)
-				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.USER_EMAIL_DOESNT_EXIST + email));
+	public Staff getStaffByUserId(Long userId) {
+		return staffRepo.findByUser_Id(userId)
+				.orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.USER_ID_DOESNT_EXIST + userId));
 	}
 }

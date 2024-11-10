@@ -44,9 +44,9 @@ class ArchivedRecordsCleanupTest {
 	@DisplayName("Should successfully clean up archived records")
 	void cleanupArchivedRecords_Success() {
 		// Arrange
-		when(userRepo.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
+		when(userRepo.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
 				.thenReturn(5);
-		when(departmentRepo.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
+		when(departmentRepo.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
 				.thenReturn(3);
 
 		// Act
@@ -54,16 +54,16 @@ class ArchivedRecordsCleanupTest {
 
 		// Assert
 		verify(userRepo, times(1))
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 		verify(departmentRepo, times(1))
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 	}
 
 	@Test
 	@DisplayName("Should abort cleanup transaction when user clean up fails")
 	void cleanupArchivedRecords_WhenUserDeletionFails() {
 		// Arrange
-		when(userRepo.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
+		when(userRepo.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
 				.thenThrow(new RuntimeException("Database error"));
 
 		// Act
@@ -71,19 +71,19 @@ class ArchivedRecordsCleanupTest {
 
 		// Assert
 		verify(userRepo, times(1))
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 		// Department deletion should not be called due to transaction rollback
 		verify(departmentRepo, never())
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 	}
 
 	@Test
 	@DisplayName("Should abort cleanup transaction when department clean up fails")
 	void cleanupArchivedRecords_WhenDepartmentDeletionFails() {
 		// Arrange
-		when(userRepo.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
+		when(userRepo.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
 				.thenReturn(5);
-		when(departmentRepo.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
+		when(departmentRepo.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
 				.thenThrow(new RuntimeException("Database error"));
 
 		// Act
@@ -91,9 +91,9 @@ class ArchivedRecordsCleanupTest {
 
 		// Assert
 		verify(userRepo, times(1))
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 		verify(departmentRepo, times(1))
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 	}
 
 	@Test
@@ -106,7 +106,7 @@ class ArchivedRecordsCleanupTest {
 		archivedRecordsCleanup.cleanupArchivedRecords();
 
 		// Assert
-		verify(userRepo).deleteByIsArchivedTrueAndArchivedAtBefore(argThat(cutoff -> {
+		verify(userRepo).deleteByArchivedTrueAndArchivedAtBefore(argThat(cutoff -> {
 			// Verify the cutoff is approximately 30 days ago
 			expectedCutoff = beforeTest.minusDays(30);
 			// Allow for a small time difference due to test execution
@@ -119,9 +119,9 @@ class ArchivedRecordsCleanupTest {
 	@DisplayName("Should run successfully even if there are no records to clean up")
 	void cleanupArchivedRecords_WhenNoRecordsDeleted() {
 		// Arrange
-		when(userRepo.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
+		when(userRepo.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
 				.thenReturn(0);
-		when(departmentRepo.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
+		when(departmentRepo.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
 				.thenReturn(0);
 
 		// Act
@@ -129,9 +129,9 @@ class ArchivedRecordsCleanupTest {
 
 		// Assert
 		verify(userRepo, times(1))
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 		verify(departmentRepo, times(1))
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 	}
 
 	@Test
@@ -139,7 +139,7 @@ class ArchivedRecordsCleanupTest {
 	void cleanupArchivedRecords_VerifyTransactionBoundary() {
 		// Arrange
 		RuntimeException expectedError = new RuntimeException("Database error");
-		when(userRepo.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
+		when(userRepo.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class)))
 				.thenThrow(expectedError);
 
 		// Act
@@ -148,8 +148,8 @@ class ArchivedRecordsCleanupTest {
 		// Assert
 		// Verify that the transaction boundary worked and the error was caught
 		verify(userRepo, times(1))
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 		verify(departmentRepo, never())
-				.deleteByIsArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
+				.deleteByArchivedTrueAndArchivedAtBefore(any(LocalDateTime.class));
 	}
 }

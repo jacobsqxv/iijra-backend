@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
 	boolean existsByName(String name);
 
-	List<Department> findByIsArchivedFalse();
+	List<Department> findByArchivedFalse();
 
-	int deleteByIsArchivedTrueAndArchivedAtBefore(LocalDateTime cutOff);
+	int deleteByArchivedTrueAndArchivedAtBefore(LocalDateTime cutOff);
 }

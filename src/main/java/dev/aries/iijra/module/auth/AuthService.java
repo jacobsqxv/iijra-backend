@@ -41,11 +41,11 @@ public class AuthService {
 		User user = ((UserDetailsImpl) auth.getPrincipal()).user();
 		checkIsInactiveOrIsDeleted(user);
 		String token = jwtService.generateToken(auth);
-		return LoginResponse.newResponse(user, token);
+		return new LoginResponse(token);
 	}
 
 	private void checkIsInactiveOrIsDeleted(User user) {
-		if (Boolean.TRUE.equals(user.getIsArchived()) || Status.INACTIVE.equals(user.getStatus())) {
+		if (Boolean.TRUE.equals(user.getArchived()) || Status.INACTIVE.equals(user.getStatus())) {
 			throw new UnauthorizedAccessException(ExceptionConstant.ACCOUNT_DEACTIVATED);
 		}
 	}

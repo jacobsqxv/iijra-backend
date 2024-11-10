@@ -90,7 +90,7 @@ class StaffServiceTest {
 			Staff savedStaff = staffCaptor.getValue();
 
 			assertEquals(savedStaff.getId(), response.staffId());
-			assertFalse(savedStaff.getIsHod());
+			assertFalse(savedStaff.getHod());
 		}
 
 		@Test
@@ -99,7 +99,7 @@ class StaffServiceTest {
 			testRequest = new StaffRequest(TEST_USER_EMAIL, "John Doe", TEST_DEPT_ID, true);
 			doReturn(testUser).when(userService).createUser(TEST_USER_EMAIL, Role.HOD);
 			when(departmentService.getDepartmentById(TEST_DEPT_ID)).thenReturn(testDept);
-			when(staffRepo.findByDepartmentIdAndIsHodTrue(TEST_DEPT_ID)).thenReturn(Optional.empty());
+			when(staffRepo.findByDepartmentIdAndHodTrue(TEST_DEPT_ID)).thenReturn(Optional.empty());
 
 			StaffResponse response = staffService.addNewStaff(testRequest);
 
@@ -117,7 +117,7 @@ class StaffServiceTest {
 			testRequest = new StaffRequest(TEST_USER_EMAIL, "John Doe", TEST_DEPT_ID, true);
 			Staff existingHod = TestDataFactory.newStaff();
 			existingHod.setFullName("Existing HOD");
-			when(staffRepo.findByDepartmentIdAndIsHodTrue(TEST_DEPT_ID)).thenReturn(Optional.of(existingHod));
+			when(staffRepo.findByDepartmentIdAndHodTrue(TEST_DEPT_ID)).thenReturn(Optional.of(existingHod));
 
 			when(departmentService.getDepartmentById(1L)).thenReturn(testDept);
 

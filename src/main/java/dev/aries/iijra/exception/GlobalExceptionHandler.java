@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 		logException(exp);
 		Set<String> details = new HashSet<>();
 		switch (exp) {
-			case UnauthorizedAccessException ex -> details.add(ExceptionConstant.ACCESS_DENIED);
+			case UnauthorizedAccessException ex -> details.add(ex.getMessage());
 			case AccessDeniedException ex -> details.add(ExceptionConstant.ACCESS_DENIED);
 			case DisabledException ex -> details.add(ExceptionConstant.ACCOUNT_DISABLED);
 			default -> details.add(exp.getMessage());

@@ -157,7 +157,7 @@ class CategoryServiceTest {
 		@Test
 		@DisplayName("Should successfully archive category when not already archived")
 		void archiveCategory_WithValidCategoryId_SuccessTest() {
-			testCategory.setIsArchived(false);
+			testCategory.setArchived(false);
 
 			when(categoryRepo.findById(TEST_CATEGORY_ID)).thenReturn(Optional.of(testCategory));
 
@@ -170,7 +170,7 @@ class CategoryServiceTest {
 		@Test
 		@DisplayName("Should throw exception when category is already archived")
 		void archiveCategory_WithAlreadyArchivedCategory_ShouldThrowException() {
-			testCategory.setIsArchived(true);
+			testCategory.setArchived(true);
 
 			when(categoryRepo.findById(TEST_CATEGORY_ID)).thenReturn(Optional.of(testCategory));
 
@@ -193,7 +193,7 @@ class CategoryServiceTest {
 		@Test
 		@DisplayName("Should successfully restore archived category when already archived")
 		void restoreArchivedCategory_WithValidCategoryId_SuccessTest() {
-			testCategory.setIsArchived(true);
+			testCategory.setArchived(true);
 
 			when(categoryRepo.findById(TEST_CATEGORY_ID)).thenReturn(Optional.of(testCategory));
 
@@ -206,7 +206,7 @@ class CategoryServiceTest {
 		@Test
 		@DisplayName("Should throw exception when category is not archived")
 		void restoreArchivedCategory_WithAlreadyArchivedCategory_ShouldThrowException() {
-			testCategory.setIsArchived(false);
+			testCategory.setArchived(false);
 
 			when(categoryRepo.findById(TEST_CATEGORY_ID)).thenReturn(Optional.of(testCategory));
 

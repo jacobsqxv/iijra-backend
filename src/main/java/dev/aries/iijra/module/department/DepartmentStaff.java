@@ -17,7 +17,7 @@ public class DepartmentStaff {
 		List<Staff> staffList = getStaff(departmentId);
 		Staff hod = null;
 		for (Staff s : staffList) {
-			if (Boolean.TRUE.equals(s.getIsHod())) hod = s;
+			if (Boolean.TRUE.equals(s.getHod())) hod = s;
 		}
 
 		if (hod != null) staffList.remove(hod);

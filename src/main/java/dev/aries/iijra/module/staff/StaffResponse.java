@@ -8,6 +8,7 @@ import lombok.Builder;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record StaffResponse(
+		Long userId,
 		String staffId,
 		String profileImage,
 		String fullName,
@@ -21,6 +22,7 @@ public record StaffResponse(
 	public static StaffResponse fullResponse(Staff staff) {
 
 		return new StaffResponse(
+				staff.getUser().getId(),
 				staff.getId(),
 				staff.getProfileImage(),
 				staff.getFullName(),
@@ -35,6 +37,7 @@ public record StaffResponse(
 
 	public static StaffResponse basicResponse(Staff staff) {
 		return StaffResponse.builder()
+				.userId(staff.getUser().getId())
 				.staffId(staff.getId())
 				.profileImage(staff.getProfileImage())
 				.fullName(staff.getFullName())
@@ -42,7 +45,7 @@ public record StaffResponse(
 	}
 
 	private static String returnPosition(Staff staff) {
-		if (Boolean.TRUE.equals(staff.getIsHod())) {
+		if (Boolean.TRUE.equals(staff.getHod())) {
 			return "Head of Department";
 		} else {
 			return "Staff";

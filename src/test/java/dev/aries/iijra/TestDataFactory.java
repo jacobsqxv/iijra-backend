@@ -16,7 +16,7 @@ public class TestDataFactory {
 				.email("test@email.com")
 				.password("hashedPassword")
 				.role(Role.STAFF)
-				.isArchived(false)
+				.archived(false)
 				.status(Status.ACTIVE).build();
 	}
 
@@ -27,7 +27,7 @@ public class TestDataFactory {
 				.user(newUser())
 				.department(newDepartment())
 				.auditing(new Auditing())
-				.isHod(false)
+				.hod(false)
 				.build();
 	}
 

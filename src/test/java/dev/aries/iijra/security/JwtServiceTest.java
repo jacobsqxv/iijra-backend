@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import dev.aries.iijra.TestDataFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +41,8 @@ class JwtServiceTest {
 	@DisplayName("Generate token with valid authentication")
 	void generateToken_WithValidAuth() {
 		Authentication auth = mock(Authentication.class);
-		when(auth.getName()).thenReturn("testUser");
+		UserDetailsImpl userDetails = new UserDetailsImpl(TestDataFactory.newUser());
+		when(auth.getPrincipal()).thenReturn(userDetails);
 		Collection<SimpleGrantedAuthority> authorities =
 				Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 		when(auth.getAuthorities())
@@ -60,7 +62,7 @@ class JwtServiceTest {
 		assertEquals("mocked.jwt.token", token);
 
 		JwtClaimsSet claims = paramsCaptor.getValue().getClaims();
-		assertEquals("testUser", claims.getSubject());
+		assertEquals(String.valueOf(1L), claims.getSubject());
 		assertTrue(claims.getExpiresAt().isAfter(Instant.now()));
 		assertEquals(List.of("ROLE_USER"),
 				(claims.getClaim("roles")));

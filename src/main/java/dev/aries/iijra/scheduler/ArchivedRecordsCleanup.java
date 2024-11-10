@@ -36,13 +36,13 @@ public class ArchivedRecordsCleanup {
 	}
 
 	private int deleteDepartments(LocalDateTime cutOff) {
-		int count = departmentRepo.deleteByIsArchivedTrueAndArchivedAtBefore(cutOff);
+		int count = departmentRepo.deleteByArchivedTrueAndArchivedAtBefore(cutOff);
 		log.debug("Deleted archived departments. count={}", count);
 		return count;
 	}
 
 	private int deleteUsers(LocalDateTime cutOff) {
-		int count = userRepo.deleteByIsArchivedTrueAndArchivedAtBefore(cutOff);
+		int count = userRepo.deleteByArchivedTrueAndArchivedAtBefore(cutOff);
 		log.debug("Deleted archived user records. count={}", count);
 		return count;
 	}

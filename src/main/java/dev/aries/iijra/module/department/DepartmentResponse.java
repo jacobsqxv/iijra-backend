@@ -41,7 +41,7 @@ public record DepartmentResponse(
 				.id(dept.getId())
 				.name(dept.getName())
 				.hod(staff.hod() != null ? staff.hod().getFullName() : NOT_ASSIGNED)
-				.staff(staff.staff.size())
+				.staff(staff.staff.size() + 1)
 				.createdAt(dept.getAuditing().getCreatedAt())
 				.build();
 	}

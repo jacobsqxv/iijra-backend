@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import dev.aries.iijra.module.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,12 +27,15 @@ public class JwtService {
 		List<String> roles = auth.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.toList();
+		User user = ((UserDetailsImpl) auth.getPrincipal()).user();
 		JwtClaimsSet claims = JwtClaimsSet.builder()
 				.issuer("IIJRA")
+				.subject(user.getId().toString())
+				.claim("email", user.getEmail())
+				.claim("status", user.getStatus().name())
+				.claim("roles", roles)
 				.issuedAt(now)
 				.expiresAt(now.plus(4, ChronoUnit.HOURS))
-				.subject(auth.getName())
-				.claim("roles", roles)
 				.build();
 		return encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 	}

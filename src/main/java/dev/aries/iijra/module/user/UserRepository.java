@@ -15,5 +15,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	boolean existsByRole(Role role);
 
-	int deleteByIsArchivedTrueAndArchivedAtBefore(LocalDateTime cutOff);
+	int deleteByArchivedTrueAndArchivedAtBefore(LocalDateTime cutOff);
 }

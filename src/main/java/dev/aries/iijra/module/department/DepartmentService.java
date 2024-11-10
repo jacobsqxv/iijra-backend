@@ -44,7 +44,7 @@ public class DepartmentService {
 
 	@Transactional(readOnly = true)
 	public List<DepartmentResponse> getAllDepartments() {
-		return departmentRepo.findByIsArchivedFalse().stream()
+		return departmentRepo.findByArchivedFalse().stream()
 				.map(d -> {
 					DepartmentResponse.DepartmentStaff staff = deptStaff.getDepartmentStaff(d.getId());
 					return DepartmentResponse.basicResponse(d, staff);
@@ -61,7 +61,7 @@ public class DepartmentService {
 	@Transactional
 	public String archiveDepartment(Long id) {
 		Department dept = getDepartmentById(id);
-		if (Boolean.TRUE.equals(dept.getIsArchived())) {
+		if (Boolean.TRUE.equals(dept.getArchived())) {
 			throw new IllegalStateException(ExceptionConstant.DEPT_ALREADY_ARCHIVED + id);
 		}
 		dept.archive();
@@ -72,7 +72,7 @@ public class DepartmentService {
 	@Transactional
 	public String restoreArchivedDepartment(Long id) {
 		Department dept = getDepartmentById(id);
-		if (Boolean.FALSE.equals(dept.getIsArchived())) {
+		if (Boolean.FALSE.equals(dept.getArchived())) {
 			throw new IllegalStateException(ExceptionConstant.DEPT_NOT_ARCHIVED + id);
 		}
 		dept.restore();

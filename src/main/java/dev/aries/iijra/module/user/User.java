@@ -55,7 +55,7 @@ public class User {
 	private Status status;
 
 	@Column(nullable = false)
-	private Boolean isArchived;
+	private Boolean archived;
 
 	private LocalDateTime archivedAt;
 
@@ -68,17 +68,17 @@ public class User {
 		this.password = password;
 		this.role = role;
 		this.status = Status.ACTIVE;
-		this.isArchived = false;
+		this.archived = false;
 	}
 
 	public void archive() {
 		this.status = Status.INACTIVE;
-		this.isArchived = true;
+		this.archived = true;
 		this.archivedAt = LocalDateTime.now();
 	}
 
 	public void restore() {
-		this.isArchived = false;
+		this.archived = false;
 		this.archivedAt = null;
 	}
 
